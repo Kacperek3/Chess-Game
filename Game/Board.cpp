@@ -1,0 +1,29 @@
+#include "Board.h"
+
+Board::Board() {
+    // Inicjalizacja planszy, np. ładowanie tekstur
+}
+
+void Board::draw(sf::RenderWindow& window) {
+    
+    sf::Color lightColor(238, 238, 210); 
+    sf::Color darkColor(118, 150, 86); 
+
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            sf::RectangleShape tile(sf::Vector2f(75, 75));
+            tile.setPosition(col * 75, row * 75);
+            if ((row + col) % 2 == 0) {
+                    tile.setFillColor(lightColor); 
+            } else {
+                tile.setFillColor(darkColor);
+            }
+            window.draw(tile);
+        }
+    }
+
+    sf::Vector2f position(10, 10);
+    Pawn pawn(0, position);
+    pawn.draw(window);
+
+}
