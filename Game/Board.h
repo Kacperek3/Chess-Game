@@ -2,6 +2,7 @@
 
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include <vector>
 #include "pawn.h"
 #include "Rook.h"
@@ -15,6 +16,10 @@ class Board {
 public:
     Board();  
     void draw(sf::RenderWindow& window);  
+    bool isEmpty(int x, int y);
+    bool isEnemyPieceAt(int boardX, int boardY, int color) const;
+    void removePiece(int boardX, int boardY);
+
     std::vector<Piece*> b_pieces;
 private:
     // Możesz dodać zmienne, które będą reprezentować stan planszy

@@ -1,18 +1,18 @@
-// Knight.cpp
 #include "Knight.h"
+#include "Board.h"
 
 Knight::Knight() {
     
 }
 
-Knight::Knight(int color, int boardX, int boardY)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Knight) 
+Knight::Knight(int color, int boardX, int boardY, Board* board)
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Knight, boardX, boardY) 
 {
-
+    this->board = board;
+    
     std::filesystem::path currentPath = std::filesystem::current_path().parent_path();
     std::string filePath;
 
-    std::cout << currentPath << std::endl;
     if (color == 0) {
         filePath = (currentPath / "assets/pieces/wKnight.png").string();
     } else {
@@ -27,12 +27,24 @@ Knight::Knight(int color, int boardX, int boardY)
     sprite.setPosition(m_position);
 }
 
-Knight::~Knight() {}
+bool Knight::isValidMove(int boardX, int boardY) {
+    // Obliczenie różnicy między aktualną a docelową pozycją
+    int dx = abs(boardX - boardPosition.x);
+    int dy = abs(boardY - boardPosition.y);
 
-void Knight::draw(sf::RenderWindow& window) {
-    window.draw(sprite);
+    // Sprawdzenie, czy ruch jest w kształcie "L" (2 pola w jednym kierunku, 1 pole w drugim)
+    if ((dx == 2 && dy == 1) || (dx == 1 && dy == 2)) {
+        // Sprawdzenie, czy na docelowej pozycji znajduje się przeciwnik lub jest puste
+        if (board->isEmpty(boardX, boardY)) {
+            return true;  // Ruch do pustego pola jest dozwolony
+        } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
+            board->removePiece(boardX, boardY);  // Zbijamy przeciwnika
+            return true;
+        }
+    }
+    
+    return false;  // W innych przypadkach ruch jest niedozwolony
 }
-
 
 void Knight::move(sf::Vector2f newPosition) {
     m_position = newPosition;
@@ -40,7 +52,20 @@ void Knight::move(sf::Vector2f newPosition) {
 }
 
 void Knight::move(int boardX, int boardY) {
-    sf::Vector2f newPosition = Position(boardX, boardY).getPixelPosition();
-    m_position = newPosition;
-    sprite.setPosition(newPosition);
+    if (isValidMove(boardX, boardY)) {
+        // Przemieść skoczka
+        m_position = Position(boardX, boardY).getPixelPosition();
+        boardPosition = Coordinate(boardX, boardY);
+        sprite.setPosition(m_position);
+    } else {
+        // Jeśli ruch jest nieprawidłowy, ustaw skoczka z powrotem na poprzednią pozycję
+        m_position = Position(boardPosition.x, boardPosition.y).getPixelPosition();
+        sprite.setPosition(m_position);
+    }
+}
+
+Knight::~Knight() {}
+
+void Knight::draw(sf::RenderWindow& window) {
+    window.draw(sprite);
 }

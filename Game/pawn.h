@@ -5,15 +5,18 @@
 #include <iostream>
 
 
+
 class Pawn : public Piece {
 public:
-    Pawn(int color, int boardX, int boardY);
+    Pawn(int color, int boardX, int boardY, Board* board);
     Pawn();
     ~Pawn();
 
     void draw(sf::RenderWindow& window) override;
     void move(int boardX, int boardY) override;
     void move(sf::Vector2f newPosition) override;
+    bool isValidMove(int boardX, int boardY);
+    
     
 private:
     bool firstMove = true;

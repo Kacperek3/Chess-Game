@@ -1,14 +1,67 @@
 #include "Board.h"
 
 Board::Board() {
-    // Inicjalizacja planszy, np. ładowanie tekstur
-    b_pieces.push_back(new Knight(BLACK, 1, 0));
-    b_pieces.push_back(new Knight(WHITE, 2, 1));
+    // białe bierki
+    b_pieces.push_back(new Rook(WHITE, 0, 0, this));
+    b_pieces.push_back(new Knight(WHITE, 1, 0, this));
+    b_pieces.push_back(new Bishop(WHITE, 2, 0, this));
+    b_pieces.push_back(new Queen(WHITE, 3, 0, this));
+    b_pieces.push_back(new King(WHITE, 4, 0, this));
+    b_pieces.push_back(new Bishop(WHITE, 5, 0, this));
+    b_pieces.push_back(new Knight(WHITE, 6, 0, this));
+    b_pieces.push_back(new Rook(WHITE, 7, 0, this));
+    for (int i = 0; i < 8; i++) {
+        b_pieces.push_back(new Pawn(WHITE, i, 1, this));
+    }
+
+    // czarne bierki
+    b_pieces.push_back(new Rook(BLACK, 0, 7, this));
+    b_pieces.push_back(new Knight(BLACK, 1, 7, this));
+    b_pieces.push_back(new Bishop(BLACK, 2, 7, this));
+    b_pieces.push_back(new Queen(BLACK, 3, 7, this));
+    b_pieces.push_back(new King(BLACK, 4, 7, this));
+    b_pieces.push_back(new Bishop(BLACK, 5, 7, this));
+    b_pieces.push_back(new Knight(BLACK, 6, 7, this));
+    b_pieces.push_back(new Rook(BLACK, 7, 7, this));
+    for (int i = 0; i < 8; i++) {
+        b_pieces.push_back(new Pawn(BLACK, i, 6, this));
+    }
+
     
 }
 
+
+bool Board::isEmpty(int x, int y) {
+    for (auto& piece : b_pieces) {
+        if (piece->getBoardPosition().x == x && piece->getBoardPosition().y == y) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Board::isEnemyPieceAt(int boardX, int boardY, int color) const {
+    for (auto& piece : b_pieces) {
+        if (piece->getBoardPosition().x == boardX && piece->getBoardPosition().y == boardY && piece->getColor() != color) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Board::removePiece(int boardX, int boardY) {
+    for (auto it = b_pieces.begin(); it != b_pieces.end(); ++it) {
+        if ((*it)->getBoardPosition().x == boardX && (*it)->getBoardPosition().y == boardY) {
+            delete *it;
+            b_pieces.erase(it);
+            break;
+        }
+    }
+}
+
+
+
 void Board::draw(sf::RenderWindow& window) {
-    
     sf::Color lightColor(238, 238, 210); 
     sf::Color darkColor(118, 150, 86); 
 

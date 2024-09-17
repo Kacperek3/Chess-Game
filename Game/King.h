@@ -7,13 +7,14 @@
 
 class King : public Piece {
 public:
-    King(int color, int boardX, int boardY);
+    King(int color, int boardX, int boardY, Board* board);
     King();
     ~King();
 
     void draw(sf::RenderWindow& window) override;
     void move(int boardX, int boardY) override;
     void move(sf::Vector2f newPosition) override;
+    bool isValidMove(int boardX, int boardY);
     
 private:
     
