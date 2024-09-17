@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Board.h"
+#include <math.h>
+#include <iostream>
 
 class Game {
 public:
@@ -14,5 +16,10 @@ private:
 
     sf::RenderWindow window;  // Główne okno SFML
     Board board;              // Obiekt planszy szachowej
+
+
+    sf::Vector2f dragOffset;  // Różnica między pozycją myszy a pionka, gdy zaczyna się przeciąganie
+    bool isDragging = false;   // Flaga mówiąca, czy aktualnie przeciągasz pionek
+    Piece* draggedPiece = nullptr; // Wskaźnik na pionek, który jest aktualnie przeciągany
 };
 

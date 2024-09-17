@@ -2,7 +2,8 @@
 
 Board::Board() {
     // Inicjalizacja planszy, np. ładowanie tekstur
-    b_pieces.push_back(new Pawn(WHITE, 1, 0));
+    b_pieces.push_back(new Knight(BLACK, 1, 0));
+    b_pieces.push_back(new Knight(WHITE, 2, 1));
     
 }
 

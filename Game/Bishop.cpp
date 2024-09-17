@@ -1,12 +1,12 @@
-// pawn.cpp
-#include "pawn.h"
+// Bishop.cpp
+#include "Bishop.h"
 
-Pawn::Pawn() {
+Bishop::Bishop() {
     
 }
 
-Pawn::Pawn(int color, int boardX, int boardY)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Pawn) 
+Bishop::Bishop(int color, int boardX, int boardY)
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Bishop) 
 {
 
     std::filesystem::path currentPath = std::filesystem::current_path().parent_path();
@@ -14,9 +14,9 @@ Pawn::Pawn(int color, int boardX, int boardY)
 
     std::cout << currentPath << std::endl;
     if (color == 0) {
-        filePath = (currentPath / "assets/pieces/wPawn.png").string();
+        filePath = (currentPath / "assets/pieces/wBishop.png").string();
     } else {
-        filePath = (currentPath / "assets/pieces/wPawn.png").string();
+        filePath = (currentPath / "assets/pieces/bBishop.png").string();
     }
 
     if (!texture.loadFromFile(filePath)) {
@@ -27,19 +27,19 @@ Pawn::Pawn(int color, int boardX, int boardY)
     sprite.setPosition(m_position);
 }
 
-Pawn::~Pawn() {}
+Bishop::~Bishop() {}
 
-void Pawn::draw(sf::RenderWindow& window) {
+void Bishop::draw(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 
 
-void Pawn::move(sf::Vector2f newPosition) {
+void Bishop::move(sf::Vector2f newPosition) {
     m_position = newPosition;
     sprite.setPosition(newPosition);
 }
 
-void Pawn::move(int boardX, int boardY) {
+void Bishop::move(int boardX, int boardY) {
     sf::Vector2f newPosition = Position(boardX, boardY).getPixelPosition();
     m_position = newPosition;
     sprite.setPosition(newPosition);

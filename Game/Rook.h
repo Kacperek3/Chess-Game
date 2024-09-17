@@ -2,20 +2,18 @@
 
 #include <SFML/Graphics.hpp>
 #include "Pieces.h"
-#include <iostream>
 
 
-class Pawn : public Piece {
+class Rook : public Piece {
 public:
-    Pawn(int color, int boardX, int boardY);
-    Pawn();
-    ~Pawn();
+    Rook(int color, int boardX, int boardY);
+    Rook();
+    ~Rook();
 
     void draw(sf::RenderWindow& window) override;
     void move(int boardX, int boardY) override;
     void move(sf::Vector2f newPosition) override;
     
 private:
-    bool firstMove = true;
     
 };

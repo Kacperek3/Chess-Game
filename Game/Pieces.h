@@ -1,6 +1,8 @@
 // pieces.h
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <filesystem>
+#include "Positions.h"
 
 #define WHITE 0
 #define BLACK 1
@@ -16,7 +18,13 @@ public:
     virtual ~Piece();  // Ensure this is virtual
 
     virtual void draw(sf::RenderWindow& window) = 0;
+    virtual void move(int boardX, int boardY) = 0;
     virtual void move(sf::Vector2f newPosition) = 0;
+
+
+    sf::Sprite& getSprite();
+    sf::Vector2f getPosition();
+    
 
 protected:
     sf::Texture texture;

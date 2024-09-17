@@ -22,10 +22,37 @@ void Game::processEvents() {
                 window.close();
                 break;
             case sf::Event::MouseButtonPressed:
-                
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+                    for (auto& piece : board.b_pieces) {
+                        if (piece->getSprite().getGlobalBounds().contains(mousePosition)) {
+                            isDragging = true;
+                            draggedPiece = dynamic_cast<Piece*>(piece);
+                            dragOffset = mousePosition - draggedPiece->getPosition();
+                            break;
+                        }
+                    }
+                }
                 break;
+
             case sf::Event::MouseButtonReleased:
-                
+                if (event.mouseButton.button == sf::Mouse::Left && isDragging) {
+                    isDragging = false;
+                    
+                    sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+                    // better rough snapping
+                    float snappedX = std::round(mousePosition.x / 82);
+                    float snappedY = std::round(mousePosition.y / 89);
+                    
+                    draggedPiece->move(snappedX, snappedY);
+                    draggedPiece = nullptr;
+                    dragOffset = sf::Vector2f(0, 0);
+                }
+                break;
+
+            default:
                 break;
             
             
@@ -35,6 +62,14 @@ void Game::processEvents() {
 
 void Game::update() {
     // Logika gry np. sprawdzanie ruchów, zmiana tur, AI itp.
+
+    if (isDragging && draggedPiece != nullptr) {
+        // Pobieranie aktualnej pozycji myszy
+        sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+        // Aktualizacja pozycji pionka
+        draggedPiece->move(mousePosition - dragOffset);
+    }
 }
 
 void Game::render() {
