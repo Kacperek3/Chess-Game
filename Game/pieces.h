@@ -2,6 +2,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+#define WHITE 0
+#define BLACK 1
+
 class Piece {
 public:
     enum class PieceType {
@@ -9,6 +12,7 @@ public:
     };
 
     Piece(int color, sf::Vector2f position, PieceType type);
+    Piece();
     virtual ~Piece();  // Ensure this is virtual
 
     virtual void draw(sf::RenderWindow& window) = 0;

@@ -1,8 +1,12 @@
 // pawn.cpp
 #include "pawn.h"
 
-Pawn::Pawn(int color, sf::Vector2f position)
-    : Piece(color, position, Piece::PieceType::Pawn) 
+Pawn::Pawn() {
+    
+}
+
+Pawn::Pawn(int color, int boardX, int boardY)
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Pawn) 
 {
     if (color == 0) {
         texture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/wPawn.png");
@@ -10,8 +14,9 @@ Pawn::Pawn(int color, sf::Vector2f position)
         texture.loadFromFile("assets/black_pawn.png");
     }
     sprite.setTexture(texture);
-    sprite.setPosition(position);
+    sprite.setPosition(m_position);
 }
+
 
 Pawn::~Pawn() {}
 

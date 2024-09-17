@@ -2,6 +2,8 @@
 
 Board::Board() {
     // Inicjalizacja planszy, np. ładowanie tekstur
+    b_pieces.push_back(new Pawn(WHITE, 1, 0));
+    
 }
 
 void Board::draw(sf::RenderWindow& window) {
@@ -21,9 +23,7 @@ void Board::draw(sf::RenderWindow& window) {
             window.draw(tile);
         }
     }
-
-    sf::Vector2f position(10, 10);
-    Pawn pawn(0, position);
-    pawn.draw(window);
-
+    for (auto& piece : b_pieces) {
+        piece->draw(window);
+    }
 }

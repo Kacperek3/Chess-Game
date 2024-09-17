@@ -2,11 +2,13 @@
 
 #include <SFML/Graphics.hpp>
 #include "pieces.h"
+#include "Positions.h"
 
 
 class Pawn : public Piece {
 public:
-    Pawn(int color, sf::Vector2f position);
+    Pawn(int color, int boardX, int boardY);
+    Pawn();
     ~Pawn();
 
     void draw(sf::RenderWindow& window) override;

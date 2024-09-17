@@ -6,5 +6,6 @@ Piece::Piece(int color, sf::Vector2f position, PieceType type)
 {
     
 }
+Piece::Piece() {}
 
 Piece::~Piece() {}

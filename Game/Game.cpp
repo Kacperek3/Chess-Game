@@ -21,7 +21,14 @@ void Game::processEvents() {
             case sf::Event::Closed:
                 window.close();
                 break;
-            // Można dodać więcej zdarzeń np. obsługę ruchu pionków, kliknięcia
+            case sf::Event::MouseButtonPressed:
+                
+                break;
+            case sf::Event::MouseButtonReleased:
+                
+                break;
+            
+            
         }
     }
 }

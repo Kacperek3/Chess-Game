@@ -2,14 +2,14 @@
 
 
 #include <SFML/Graphics.hpp>
-#include <map>
+#include <vector>
 #include "pawn.h"
 
 class Board {
 public:
-    Board();  // Konstruktor
-    void draw(sf::RenderWindow& window);  // Funkcja rysująca planszę
-
+    Board();  
+    void draw(sf::RenderWindow& window);  
+    std::vector<Piece*> b_pieces;
 private:
     // Możesz dodać zmienne, które będą reprezentować stan planszy
 };
