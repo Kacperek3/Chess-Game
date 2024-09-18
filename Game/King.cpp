@@ -27,6 +27,37 @@ King::King(int color, int boardX, int boardY, Board* board)
     sprite.setPosition(m_position);
 }
 
+std::vector<Coordinate> King::getPossibleMoves() {
+    std::vector<Coordinate> possibleMoves;
+
+    int directions[8][2] = {
+        {1, 0},   // W prawo
+        {1, 1},   // W prawo w dół
+        {0, 1},   // W dół
+        {-1, 1},  // W lewo w dół
+        {-1, 0},  // W lewo
+        {-1, -1}, // W lewo w górę
+        {0, -1},  // W górę
+        {1, -1}   // W prawo w górę
+    };
+
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x + dx;
+        int y = boardPosition.y + dy;
+
+        if (board->isWithinBounds(x, y)) {
+            if (board->isEmpty(x, y) || board->isEnemyPieceAt(x, y, m_color)) {
+                possibleMoves.push_back(Coordinate(x, y));
+            }
+        }
+    }
+
+    return possibleMoves;
+}
+
 bool King::isValidMove(int boardX, int boardY) {
     int deltaX = abs(boardX - boardPosition.x);
     int deltaY = abs(boardY - boardPosition.y);

@@ -49,9 +49,16 @@ void Game::processEvents() {
 
                     if (draggedPiece->isValidMove(snappedX, snappedY)) {
                         draggedPiece->move(snappedX, snappedY);
-                        
-                        // zmien turę po dozwolonym ruchu
                         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
+
+                        if (board.isCheckmate(currentPlayerTurn)) {
+                            std::cout << "Checkmate! Gracz " << ((currentPlayerTurn == WHITE) ? "czarny" : "biały") << " wygrał!" << std::endl;
+                            window.close();  // Zamknięcie gry lub wywołanie końca gry
+                        }
+
+
+                        // zmien turę po dozwolonym ruchu
+                        
                     }
                     else{
                         draggedPiece->move(draggedPiece->getBoardPosition().x, draggedPiece->getBoardPosition().y);
@@ -72,8 +79,8 @@ void Game::processEvents() {
 }
 
 void Game::update() {
+    
     // Logika gry np. sprawdzanie ruchów, zmiana tur, AI itp.
-
     if (isDragging && draggedPiece != nullptr) {
         // Pobieranie aktualnej pozycji myszy
         sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -81,6 +88,7 @@ void Game::update() {
         // Aktualizacja pozycji pionka
         draggedPiece->move(mousePosition - dragOffset);
     }
+    
 }
 
 void Game::render() {

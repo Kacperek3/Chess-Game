@@ -29,6 +29,36 @@ Pawn::Pawn(int color, int boardX, int boardY, Board* board)
 }
 
 
+
+std::vector<Coordinate> Pawn::getPossibleMoves() {
+    std::vector<Coordinate> possibleMoves;
+    int direction = (m_color == WHITE) ? -1 : 1;  // Kierunek ruchu: do góry dla białych, na dół dla czarnych
+
+    // Ruch do przodu o jedno pole
+    if (board->isEmpty(boardPosition.x, boardPosition.y + direction)) {
+        possibleMoves.push_back(Coordinate(boardPosition.x, boardPosition.y + direction));
+    }
+
+    // Ruch do przodu o dwa pola, tylko na pierwszym ruchu
+    if (firstMove && board->isEmpty(boardPosition.x, boardPosition.y + direction) &&
+        board->isEmpty(boardPosition.x, boardPosition.y + 2 * direction)) {
+        possibleMoves.push_back(Coordinate(boardPosition.x, boardPosition.y + 2 * direction));
+    }
+
+    // Ruch po skosie (atak), jeśli na tym polu znajduje się figura przeciwnika
+    if (board->isEnemyPieceAt(boardPosition.x + 1, boardPosition.y + direction, m_color)) {
+        possibleMoves.push_back(Coordinate(boardPosition.x + 1, boardPosition.y + direction));
+    }
+    if (board->isEnemyPieceAt(boardPosition.x - 1, boardPosition.y + direction, m_color)) {
+        possibleMoves.push_back(Coordinate(boardPosition.x - 1, boardPosition.y + direction));
+    }
+
+    // Możliwość dodania funkcji dla bicia w przelocie (en passant) oraz promocji pionka
+
+    return possibleMoves;
+}
+
+
 bool Pawn::isValidMove(int boardX, int boardY) {
     int direction = (m_color == WHITE) ? -1 : 1;  // Kierunek ruchu: do góry dla białych, na dół dla czarnych
     

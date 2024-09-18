@@ -16,6 +16,7 @@ public:
     bool isValidMove(int boardX, int boardY);
     bool isValidRookMove(int boardX, int boardY);
     bool isValidBishopMove(int boardX, int boardY);
+    std::vector<Coordinate> getPossibleMoves() override;
     
 private:
     

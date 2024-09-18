@@ -27,6 +27,83 @@ Queen::Queen(int color, int boardX, int boardY, Board* board)
     sprite.setPosition(m_position);
 }
 
+
+std::vector<Coordinate> Queen::getPossibleMoves() {
+    std::vector<Coordinate> possibleMoves;
+
+    // Kierunki ruchu - przekątne (jak goniec)
+    int diagonalDirections[4][2] = {
+        {1, 1},   // Przekątna w prawo w dół
+        {-1, 1},  // Przekątna w lewo w dół
+        {-1, -1}, // Przekątna w lewo w górę
+        {1, -1}   // Przekątna w prawo w górę
+    };
+
+    // Kierunki ruchu - pionowe i poziome (jak wieża)
+    int straightDirections[4][2] = {
+        {1, 0},   // W prawo
+        {-1, 0},  // W lewo
+        {0, 1},   // W dół
+        {0, -1}   // W górę
+    };
+
+    // Sprawdzanie wszystkich kierunków (przekątne)
+    for (auto& direction : diagonalDirections) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x;
+        int y = boardPosition.y;
+
+        while (true) {
+            x += dx;
+            y += dy;
+
+            if (board->isWithinBounds(x, y)) {
+                if (board->isEmpty(x, y)) {
+                    possibleMoves.push_back(Coordinate(x, y));
+                } else {
+                    if (board->isEnemyPieceAt(x, y, m_color)) {
+                        possibleMoves.push_back(Coordinate(x, y));
+                    }
+                    break;  // Nie można kontynuować po napotkaniu bierki
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Sprawdzanie wszystkich kierunków (pionowe i poziome)
+    for (auto& direction : straightDirections) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x;
+        int y = boardPosition.y;
+
+        while (true) {
+            x += dx;
+            y += dy;
+
+            if (board->isWithinBounds(x, y)) {
+                if (board->isEmpty(x, y)) {
+                    possibleMoves.push_back(Coordinate(x, y));
+                } else {
+                    if (board->isEnemyPieceAt(x, y, m_color)) {
+                        possibleMoves.push_back(Coordinate(x, y));
+                    }
+                    break;  // Nie można kontynuować po napotkaniu bierki
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    return possibleMoves;
+}
+
 bool Queen::isValidMove(int boardX, int boardY) {
     int deltaX = abs(boardX - boardPosition.x);
     int deltaY = abs(boardY - boardPosition.y);

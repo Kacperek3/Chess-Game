@@ -15,6 +15,7 @@ public:
     void draw(sf::RenderWindow& window) override;
     void move(int boardX, int boardY) override;
     bool isValidMove(int boardX, int boardY);
+    std::vector<Coordinate> getPossibleMoves() override;
     
     
 private:

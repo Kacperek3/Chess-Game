@@ -26,6 +26,49 @@ Bishop::Bishop(int color, int boardX, int boardY, Board* board)
     sprite.setPosition(m_position);
 }
 
+std::vector<Coordinate> Bishop::getPossibleMoves() {
+    std::vector<Coordinate> possibleMoves;
+
+    int directions[4][2] = {
+        {1, 1},   // Przekątna w prawo w dół
+        {-1, 1},  // Przekątna w lewo w dół
+        {-1, -1}, // Przekątna w lewo w górę
+        {1, -1}   // Przekątna w prawo w górę
+    };
+
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x;
+        int y = boardPosition.y;
+
+        // Przechodzimy w danym kierunku, dopóki możemy się poruszać
+        while (true) {
+            x += dx;
+            y += dy;
+
+            // Sprawdzenie, czy współrzędne są w granicach planszy
+            if (board->isWithinBounds(x, y)) {
+                if (board->isEmpty(x, y)) {
+                    possibleMoves.push_back(Coordinate(x, y));
+                } else {
+                    // Jeśli jest to bierka przeciwnika, dodajemy ruch, ale nie możemy iść dalej
+                    if (board->isEnemyPieceAt(x, y, m_color)) {
+                        possibleMoves.push_back(Coordinate(x, y));
+                    }
+                    break; // Przerywamy pętlę, bo natrafiliśmy na bierkę
+                }
+            } else {
+                break; // Wyszedłeś poza planszę
+            }
+        }
+    }
+
+    return possibleMoves;
+}
+
+
 bool Bishop::isValidMove(int boardX, int boardY) {
     int dx = abs(boardX - boardPosition.x);
     int dy = abs(boardY - boardPosition.y);

@@ -27,6 +27,39 @@ Knight::Knight(int color, int boardX, int boardY, Board* board)
     sprite.setPosition(m_position);
 }
 
+
+std::vector<Coordinate> Knight::getPossibleMoves() {
+    std::vector<Coordinate> possibleMoves;
+
+    int directions[8][2] = {
+        {2, 1},   // 2 w prawo, 1 w dół
+        {1, 2},   // 1 w prawo, 2 w dół
+        {-1, 2},  // 1 w lewo, 2 w dół
+        {-2, 1},  // 2 w lewo, 1 w dół
+        {-2, -1}, // 2 w lewo, 1 w górę
+        {-1, -2}, // 1 w lewo, 2 w górę
+        {1, -2},  // 1 w prawo, 2 w górę
+        {2, -1}   // 2 w prawo, 1 w górę
+    };
+
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x + dx;
+        int y = boardPosition.y + dy;
+
+        if (board->isWithinBounds(x, y)) {
+            if (board->isEmpty(x, y) || board->isEnemyPieceAt(x, y, m_color)) {
+                possibleMoves.push_back(Coordinate(x, y));
+            }
+        }
+    }
+
+    return possibleMoves;
+}
+
+
 bool Knight::isValidMove(int boardX, int boardY) {
     // Obliczenie różnicy między aktualną a docelową pozycją
     int dx = abs(boardX - boardPosition.x);

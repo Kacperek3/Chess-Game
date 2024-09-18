@@ -27,6 +27,48 @@ Rook::Rook(int color, int boardX, int boardY, Board* board)
     sprite.setPosition(m_position);
 }
 
+std::vector<Coordinate> Rook::getPossibleMoves() {
+    std::vector<Coordinate> possibleMoves;
+
+    // Kierunki ruchu wieży (pionowe i poziome)
+    int directions[4][2] = {
+        {1, 0},   // W prawo
+        {-1, 0},  // W lewo
+        {0, 1},   // W dół
+        {0, -1}   // W górę
+    };
+
+    // Sprawdzanie wszystkich kierunków
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x;
+        int y = boardPosition.y;
+
+        while (true) {
+            x += dx;
+            y += dy;
+
+            if (board->isWithinBounds(x, y)) {
+                if (board->isEmpty(x, y)) {
+                    possibleMoves.push_back(Coordinate(x, y));
+                } else {
+                    if (board->isEnemyPieceAt(x, y, m_color)) {
+                        possibleMoves.push_back(Coordinate(x, y));
+                    }
+                    break;  // Nie można kontynuować po napotkaniu bierki
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    return possibleMoves;
+}
+
+
 bool Rook::isValidMove(int boardX, int boardY) {
     // Sprawdzenie, czy ruch jest w linii prostej (po osi X lub Y)
     if (boardX != boardPosition.x && boardY != boardPosition.y) {
