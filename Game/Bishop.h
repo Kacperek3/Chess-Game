@@ -15,6 +15,7 @@ public:
     void move(int boardX, int boardY) override;
     bool isValidMove(int boardX, int boardY);
     std::vector<Coordinate> getPossibleMoves() override;
+    std::vector<Coordinate> getPossibleCaptures() override;
     
 private:
     

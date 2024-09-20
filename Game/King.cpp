@@ -13,10 +13,10 @@ King::King(int color, int boardX, int boardY, Board* board)
     std::filesystem::path currentPath = std::filesystem::current_path().parent_path();
     std::string filePath;
 
-    if (color == 0) {
-        filePath = (currentPath / "assets/pieces/wKing.png").string();
+    if (color == WHITE) {
+        filePath = (currentPath / "assets/pieces/chessCom1/wk.png").string();
     } else {
-        filePath = (currentPath / "assets/pieces/bKing.png").string();
+        filePath = (currentPath / "assets/pieces/chessCom1/bk.png").string();
     }
 
     if (!texture.loadFromFile(filePath)) {
@@ -56,6 +56,39 @@ std::vector<Coordinate> King::getPossibleMoves() {
     }
 
     return possibleMoves;
+}
+
+std::vector<Coordinate> King::getPossibleCaptures() {
+    std::vector<Coordinate> possibleCaptures;
+
+    int directions[8][2] = {
+        {1, 0},   // W prawo
+        {1, 1},   // W prawo w dół
+        {0, 1},   // W dół
+        {-1, 1},  // W lewo w dół
+        {-1, 0},  // W lewo
+        {-1, -1}, // W lewo w górę
+        {0, -1},  // W górę
+        {1, -1}   // W prawo w górę
+    };
+
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x + dx;
+        int y = boardPosition.y + dy;
+
+        // Sprawdzanie, czy pozycja jest w granicach planszy
+        if (board->isWithinBounds(x, y)) {
+            // Jeśli na pozycji znajduje się bierka przeciwnika, dodajemy do możliwych bić
+            if (board->isEnemyPieceAt(x, y, m_color)) {
+                possibleCaptures.push_back(Coordinate(x, y));
+            }
+        }
+    }
+
+    return possibleCaptures;
 }
 
 bool King::isValidMove(int boardX, int boardY) {

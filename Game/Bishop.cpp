@@ -13,9 +13,9 @@ Bishop::Bishop(int color, int boardX, int boardY, Board* board)
     std::string filePath;
 
     if (color == 0) {
-        filePath = (currentPath / "assets/pieces/wBishop.png").string();
+        filePath = (currentPath / "assets/pieces/chessCom1/wb.png").string();
     } else {
-        filePath = (currentPath / "assets/pieces/bBishop.png").string();
+        filePath = (currentPath / "assets/pieces/chessCom1/bb.png").string();
     }
 
     if (!texture.loadFromFile(filePath)) {
@@ -68,6 +68,45 @@ std::vector<Coordinate> Bishop::getPossibleMoves() {
     return possibleMoves;
 }
 
+std::vector<Coordinate> Bishop::getPossibleCaptures() {
+    std::vector<Coordinate> possibleCaptures;
+
+    int directions[4][2] = {
+        {1, 1},   // Przekątna w prawo w dół
+        {-1, 1},  // Przekątna w lewo w dół
+        {-1, -1}, // Przekątna w lewo w górę
+        {1, -1}   // Przekątna w prawo w górę
+    };
+
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x;
+        int y = boardPosition.y;
+
+        // Przechodzimy w danym kierunku, dopóki nie napotkamy figur
+        while (true) {
+            x += dx;
+            y += dy;
+
+            // Sprawdzenie, czy współrzędne są w granicach planszy
+            if (board->isWithinBounds(x, y)) {
+                if (!board->isEmpty(x, y)) {
+                    // Jeśli jest to bierka przeciwnika, dodajemy ją jako możliwy ruch
+                    if (board->isEnemyPieceAt(x, y, m_color)) {
+                        possibleCaptures.push_back(Coordinate(x, y));
+                    }
+                    break; // Natrafiliśmy na bierkę, więc nie możemy dalej iść w tym kierunku
+                }
+            } else {
+                break; // Wyszedłeś poza planszę
+            }
+        }
+    }
+
+    return possibleCaptures;
+}
 
 bool Bishop::isValidMove(int boardX, int boardY) {
     int dx = abs(boardX - boardPosition.x);

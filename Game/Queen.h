@@ -13,10 +13,11 @@ public:
 
     void draw(sf::RenderWindow& window) override;
     void move(int boardX, int boardY) override;
-    bool isValidMove(int boardX, int boardY);
+    bool isValidMove(int boardX, int boardY) override;
     bool isValidRookMove(int boardX, int boardY);
     bool isValidBishopMove(int boardX, int boardY);
     std::vector<Coordinate> getPossibleMoves() override;
+    std::vector<Coordinate> getPossibleCaptures() override;
     
 private:
     

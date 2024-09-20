@@ -6,6 +6,7 @@ Game::Game()
 }
 
 void Game::run() {
+    window.setFramerateLimit(60);  // Ograniczenie liczby klatek na sekundę
     // Główna pętla gry
     while (window.isOpen()) {
         processEvents();  // Przetwarzanie zdarzeń
@@ -28,7 +29,6 @@ void Game::processEvents() {
                     showCoordinates = !showCoordinates;
                 }
                 break;
-
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -49,10 +49,11 @@ void Game::processEvents() {
                     isDragging = false;
                     
                     sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    
 
                     // Zaokrąglenie pozycji myszy do najbliższego pola
-                    float snappedX = std::round(mousePosition.x / 82);
-                    float snappedY = std::round(mousePosition.y / 89);
+                    float snappedX = int(mousePosition.x / 75);
+                    float snappedY = int(mousePosition.y / 75);
                     
 
                     if (draggedPiece->isValidMove(snappedX, snappedY) && !board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY))) {
@@ -90,13 +91,7 @@ void Game::processEvents() {
 void Game::update() {
     
     // Logika gry np. sprawdzanie ruchów, zmiana tur, AI itp.
-    if (isDragging && draggedPiece != nullptr) {
-        // Pobieranie aktualnej pozycji myszy
-        sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
-        // Aktualizacja pozycji pionka
-        draggedPiece->move(mousePosition - dragOffset);
-    }
+    
     
 }
 
@@ -104,7 +99,21 @@ void Game::render() {
     window.clear();
 
     // Rysowanie planszy i elementów gry
-    board.draw(window, showCoordinates);
+    board.drawBoard(window, showCoordinates);
+    
+    if(isDragging && draggedPiece != nullptr){
+        board.showPossibleMoves(window, draggedPiece);
+        board.showPossibleCaptures(window, draggedPiece);
+        board.markPieceField(window, draggedPiece);
 
+
+
+        // przesuwanie pionka, który jest aktualnie przeciągany, musi być rysowany na wierzchu dlatego jest tutaj
+        sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+        draggedPiece->move(mousePosition - dragOffset);
+    }
+    board.drawPieces(window, draggedPiece);
     window.display();
 }
+
+

@@ -102,6 +102,18 @@ std::vector<Coordinate> Board::getValidMoves(Piece* piece) {
 
     return validMoves;
 }
+std::vector<Coordinate> Board::getValidCaptures(Piece* piece) {
+    std::vector<Coordinate> validCaptures;
+    std::vector<Coordinate> allCaptures = piece->getPossibleCaptures();  // Get all possible moves for the piece
+
+    for (auto& capture : allCaptures) {
+        if (isWithinBounds(capture.x, capture.y) && !isKingInCheckAfterMove(piece, capture)) {
+            validCaptures.push_back(capture);
+        }
+    }
+
+    return validCaptures;
+}
 
 void Board::simulateMove(Piece* piece, Coordinate targetPosition) {
     Coordinate originalPosition = piece->getBoardPosition();
@@ -226,7 +238,49 @@ bool Board::isCheckmate(int color) {
 }
 
 
-void Board::draw(sf::RenderWindow& window, bool showCoordinates) {
+void Board::showPossibleMoves(sf::RenderWindow& window, Piece* piece){
+    std::vector<Coordinate> possibleMoves = getValidMoves(piece);
+    sf::Color circleColor(183, 180, 180, 128);
+    for(auto& move : possibleMoves){
+        sf::CircleShape circle(10);
+        circle.setFillColor(circleColor);
+        circle.setPosition(move.x * 75 + 28, move.y * 75 + 28);
+        window.draw(circle);
+    }
+}
+
+void Board::showPossibleCaptures(sf::RenderWindow& window, Piece* piece){
+    sf::Color recColor(245, 90, 105, 128);
+    std::vector<Coordinate> possibleCaptures = getValidCaptures(piece);
+    for(auto& capture : possibleCaptures){
+        sf::RectangleShape markedField(sf::Vector2f(75, 75));
+        markedField.setFillColor(recColor);
+        markedField.setPosition(capture.x * 75, capture.y * 75);
+        window.draw(markedField);
+    }
+}
+
+void Board::markPieceField(sf::RenderWindow& window, Piece* piece){
+    sf::Color recColor(223, 223, 103, 128);
+    sf::RectangleShape markedField(sf::Vector2f(75, 75));
+    markedField.setFillColor(recColor);
+    markedField.setPosition(piece->getBoardPosition().x * 75, piece->getBoardPosition().y * 75);
+    window.draw(markedField);
+}
+
+void Board::drawPieces(sf::RenderWindow& window, Piece* draggedPiece) {
+    for (auto& piece : b_pieces) {
+        if (piece != draggedPiece) {
+            piece->draw(window);
+        }
+    }
+    if (draggedPiece != nullptr) {
+        draggedPiece->draw(window);
+    }
+}
+
+
+void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
     sf::Color lightColor(238, 238, 210); 
     sf::Color darkColor(118, 150, 86); 
 
@@ -265,9 +319,5 @@ void Board::draw(sf::RenderWindow& window, bool showCoordinates) {
                 window.draw(coordinates);
             }
         }
-    }
-
-    for (auto& piece : b_pieces) {
-        piece->draw(window);
     }
 }
