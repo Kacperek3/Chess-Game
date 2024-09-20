@@ -79,7 +79,6 @@ bool Pawn::isValidMove(int boardX, int boardY) {
     // Ruch po skosie (atak), jeśli na tym polu znajduje się figura przeciwnika
     if (abs(boardX - boardPosition.x) == 1 && boardY == boardPosition.y + direction) {
         if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
-            board->removePiece(boardX, boardY);
             return true;
         }
     }

@@ -89,7 +89,6 @@ bool Bishop::isValidMove(int boardX, int boardY) {
         if (board->isEmpty(boardX, boardY)) {
             return true;
         } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
-            board->removePiece(boardX, boardY);  // Zbijamy przeciwnika
             return true;
         }
     }

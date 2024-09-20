@@ -21,6 +21,14 @@ void Game::processEvents() {
             case sf::Event::Closed:
                 window.close();
                 break;
+
+            case sf::Event::KeyPressed:
+                if (event.key.code == sf::Keyboard::R) {
+                    // Przełącz widoczność koordynatów po naciśnięciu 'R'
+                    showCoordinates = !showCoordinates;
+                }
+                break;
+
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -47,16 +55,19 @@ void Game::processEvents() {
                     float snappedY = std::round(mousePosition.y / 89);
                     
 
-                    if (draggedPiece->isValidMove(snappedX, snappedY)) {
+                    if (draggedPiece->isValidMove(snappedX, snappedY) && !board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY))) {
+                        if(board.isEnemyPieceAt(snappedX, snappedY, draggedPiece->getColor())){
+                            std::cout << "Zbito" << std::endl;
+                            board.removePiece(snappedX, snappedY);
+                        }
                         draggedPiece->move(snappedX, snappedY);
                         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
                         
-                        for(Coordinate c : draggedPiece->getPossibleMoves()){
-                            std::cout <<c.x << " " << c.y << std::endl;
-                        }
-                        std::cout << std::endl;
-                        // zmien turę po dozwolonym ruchu
                         
+                        // zmien turę po dozwolonym ruchu
+                        if(board.isCheckmate(currentPlayerTurn)){
+                            std::cout << "Szach" << std::endl;
+                        }
                     }
                     else{
                         draggedPiece->move(draggedPiece->getBoardPosition().x, draggedPiece->getBoardPosition().y);
@@ -93,7 +104,7 @@ void Game::render() {
     window.clear();
 
     // Rysowanie planszy i elementów gry
-    board.draw(window);
+    board.draw(window, showCoordinates);
 
     window.display();
 }

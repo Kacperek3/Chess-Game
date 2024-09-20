@@ -5,9 +5,14 @@ Board::Board() {
     // czarne bierki
     
     b_pieces.push_back(new Queen(BLACK, 3, 0, this));
+    b_pieces.push_back(new King(BLACK, 4, 0, this));
+    b_pieces.push_back(new Queen(BLACK, 0, 0, this));
     
     //b_pieces.push_back(new Pawn(WHITE, 3, 7, this));
-    b_pieces.push_back(new Pawn(WHITE, 4, 7, this));
+    //b_pieces.push_back(new Pawn(WHITE, 4, 7, this));
+    
+    b_pieces.push_back(new King(WHITE, 4, 7, this));
+    b_pieces.push_back(new Rook(WHITE, 0, 6, this));
 }
 
 
@@ -21,8 +26,8 @@ bool Board::isEmpty(int x, int y) {
 }
 
 bool Board::isEnemyPieceAt(int boardX, int boardY, int color) const {
-    for (auto& piece : b_pieces) {
-        if (piece->getBoardPosition().x == boardX && piece->getBoardPosition().y == boardY && piece->getColor() != color) {
+    for (const auto& piece : enemyPieces(color)) {
+        if (piece->getBoardPosition().x == boardX && piece->getBoardPosition().y == boardY) {
             return true;
         }
     }
@@ -30,14 +35,16 @@ bool Board::isEnemyPieceAt(int boardX, int boardY, int color) const {
 }
 
 void Board::removePiece(int boardX, int boardY) {
-    for (auto it = b_pieces.begin(); it != b_pieces.end(); ++it) {
-        if ((*it)->getBoardPosition().x == boardX && (*it)->getBoardPosition().y == boardY) {
-            delete *it;
-            b_pieces.erase(it);
-            break;
+    for (auto it = b_pieces.begin(); it != b_pieces.end(); ) {
+        if ((*it) != nullptr && (*it)->getBoardPosition().x == boardX && (*it)->getBoardPosition().y == boardY) {
+            delete *it;                // Usunięcie obiektu
+            it = b_pieces.erase(it);    // Usuń element z wektora i zaktualizuj iterator
+        } else {
+            ++it; // Przejdź do następnego elementu tylko wtedy, gdy nie usuwasz elementu
         }
     }
 }
+
 
 
 
@@ -73,7 +80,7 @@ std::vector<Piece*> Board::playerPieces(int color) {
     return playerPieces;
 }
 
-std::vector<Piece*> Board::enemyPieces(int color) {
+std::vector<Piece*> Board::enemyPieces(int color) const{
     std::vector<Piece*> enemyPieces;
     for (auto& piece : b_pieces) {
         if (piece->getColor() != color) {
@@ -124,15 +131,16 @@ bool Board::isKingInCheckAfterMove(Piece* movedPiece, Coordinate targetPosition)
     }
 
     if (capturedPiece != nullptr) {
-        removePiece(targetPosition.x, targetPosition.y);
+        capturedPiece->move(-1, -1);
     }
 
     movedPiece->move(targetPosition.x, targetPosition.y);
     bool isCheck = isKingInCheck(movedPiece->getColor());
 
     movedPiece->move(originalPosition.x, originalPosition.y);
+
     if (capturedPiece != nullptr) {
-        b_pieces.push_back(capturedPiece);
+        capturedPiece->move(targetPosition.x, targetPosition.y);
     }
 
     return isCheck;
@@ -143,7 +151,6 @@ bool Board::isKingInCheck(int color) {
     King* king = dynamic_cast<King*>(findKing(color));
     Coordinate kingPosition = king->getBoardPosition();
 
-    // mozliwe ze bedzie to zabijac krola i wtedy isValidMove do naprawy
     for (auto& piece : b_pieces) {
         if (piece->getColor() != color) {
             if (piece->isValidMove(kingPosition.x, kingPosition.y)) {
@@ -189,15 +196,10 @@ bool Board::canPreventCheck(int color) {
         
         for (const auto& move : validMoves) {
             // Symuluj ruch
-            simulateMove(piece, move);
-            
-            // Sprawdź, czy król nadal jest w szachu po tym ruchu
-            if (!isKingInCheck(color)) {
-                undoMove(piece,originalPosition,nullptr);  // Cofnij ruch
-                return true;  // Ruch zapobiega szachowi
-            }
 
-            undoMove(piece,originalPosition,nullptr);  // Cofnij ruch
+            if(!isKingInCheckAfterMove(piece, move)){
+                return true;
+            }
         }
     }
     return false;
@@ -224,7 +226,7 @@ bool Board::isCheckmate(int color) {
 }
 
 
-void Board::draw(sf::RenderWindow& window) {
+void Board::draw(sf::RenderWindow& window, bool showCoordinates) {
     sf::Color lightColor(238, 238, 210); 
     sf::Color darkColor(118, 150, 86); 
 
@@ -248,18 +250,20 @@ void Board::draw(sf::RenderWindow& window) {
             }
             window.draw(tile);
 
-            // Tworzenie tekstu z koordynatami
-            sf::Text coordinates;
-            coordinates.setFont(font);
-            coordinates.setString(std::to_string(row) + " " + std::to_string(col));
-            coordinates.setCharacterSize(20);  // Rozmiar tekstu
-            coordinates.setFillColor(sf::Color::Black);  // Kolor tekstu
+            // Rysowanie koordynatów, jeśli showCoordinates jest true
+            if (showCoordinates) {
+                sf::Text coordinates;
+                coordinates.setFont(font);
+                coordinates.setString(std::to_string(col) + " " + std::to_string(row));
+                coordinates.setCharacterSize(20);  // Rozmiar tekstu
+                coordinates.setFillColor(sf::Color::Black);  // Kolor tekstu
 
-            // Pozycjonowanie tekstu na środku pola
-            coordinates.setPosition(col * 75 + 20, row * 75 + 20); 
+                // Pozycjonowanie tekstu na środku pola
+                coordinates.setPosition(col * 75 + 20, row * 75 + 20); 
 
-            // Rysowanie tekstu
-            window.draw(coordinates);
+                // Rysowanie tekstu
+                window.draw(coordinates);
+            }
         }
     }
 

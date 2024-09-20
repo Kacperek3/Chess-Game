@@ -69,7 +69,6 @@ bool King::isValidMove(int boardX, int boardY) {
             return true;
         } 
         else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
-            board->removePiece(boardX, boardY);  // Zbijamy przeciwnika
             return true;
         }
     }

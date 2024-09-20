@@ -142,7 +142,6 @@ bool Queen::isValidRookMove(int boardX, int boardY) {
     if (board->isEmpty(boardX, boardY)) {
         return true;
     } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
-        board->removePiece(boardX, boardY);  // Zbijamy przeciwnika
         return true;
     }
 
@@ -163,7 +162,6 @@ bool Queen::isValidBishopMove(int boardX, int boardY) {
     if (board->isEmpty(boardX, boardY)) {
             return true;
     } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
-        board->removePiece(boardX, boardY);  // Zbijamy przeciwnika
         return true;
     }
 
