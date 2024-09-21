@@ -241,10 +241,6 @@ bool Queen::isValidBishopMove(int boardX, int boardY) {
     return false;
 }
 
-void Queen::move(int boardX, int boardY) {
-    Piece::move(boardX, boardY);
-}
-
 Queen::~Queen() {}
 
 void Queen::draw(sf::RenderWindow& window) {

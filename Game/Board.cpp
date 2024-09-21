@@ -5,12 +5,13 @@ Board::Board() {
     // czarne bierki
     
     b_pieces.push_back(new King(BLACK, 4, 0, this));
-    b_pieces.push_back(new Pawn(BLACK, 0, 4, this));
+    b_pieces.push_back(new Pawn(BLACK, 1, 5, this));
     
     //b_pieces.push_back(new Pawn(WHITE, 3, 7, this));
     //b_pieces.push_back(new Pawn(WHITE, 4, 7, this));
     
     b_pieces.push_back(new King(WHITE, 4, 7, this));
+    b_pieces.push_back(new Pawn(WHITE, 2, 2, this));
 }
 
 
@@ -113,14 +114,9 @@ std::vector<Coordinate> Board::getValidCaptures(Piece* piece) {
     return validCaptures;
 }
 
-void Board::simulateMove(Piece* piece, Coordinate targetPosition) {
-    Coordinate originalPosition = piece->getBoardPosition();
-    piece->move(targetPosition.x, targetPosition.y);
-}
-
 void Board::undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece) {
     // przywrocenie oryginalnej pozycji
-    piece->move(originalPosition.x, originalPosition.y);
+    piece->simulateMove(originalPosition.x, originalPosition.y);
 
     // jesli byla zbita jakas figura to dodaj ja z powrotem
     if (capturedPiece) {
@@ -141,16 +137,16 @@ bool Board::isKingInCheckAfterMove(Piece* movedPiece, Coordinate targetPosition)
     }
 
     if (capturedPiece != nullptr) {
-        capturedPiece->move(-1, -1);
+        capturedPiece->simulateMove(-1, -1);
     }
 
-    movedPiece->move(targetPosition.x, targetPosition.y);
+    movedPiece->simulateMove(targetPosition.x, targetPosition.y);
     bool isCheck = isKingInCheck(movedPiece->getColor());
 
-    movedPiece->move(originalPosition.x, originalPosition.y);
+    movedPiece->simulateMove(originalPosition.x, originalPosition.y);
 
     if (capturedPiece != nullptr) {
-        capturedPiece->move(targetPosition.x, targetPosition.y);
+        capturedPiece->simulateMove(targetPosition.x, targetPosition.y);
     }
 
     return isCheck;
@@ -236,36 +232,83 @@ bool Board::isCheckmate(int color) {
 }
 
 
-
 void Board::promotePawn(Piece* pawn) {
-    // Display promotion UI (or terminal-based selection)
-    std::cout << "Promote to: (Q)ueen, (R)ook, (B)ishop, (K)night" << std::endl;
-    char choice;
-    std::cin >> choice;
+    // Tworzenie nowego okna dla interfejsu promocji
+    sf::RenderWindow promotionWindow(sf::VideoMode(270, 200), "Pawn Promotion");
 
-    Piece* newPiece = nullptr;
-    switch (choice) {
-        case 'Q':
-            newPiece = new Queen(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
-            break;
-        case 'R':
-            newPiece = new Rook(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
-            break;
-        case 'B':
-            newPiece = new Bishop(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
-            break;
-        case 'K':
-            newPiece = new Knight(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
-            break;
-        default:
-            std::cout << "Invalid choice, defaulting to Queen" << std::endl;
-            newPiece = new Queen(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
+    sf::Texture queenTexture, rookTexture, bishopTexture, knightTexture;
+    if(pawn->getColor() == WHITE){
+        if(!queenTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wq.png") ||
+           !rookTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wr.png") ||
+           !bishopTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wb.png") ||
+           !knightTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wn.png")) {
+            return; // Obsłuż błąd ładowania
+        }
+    } else {
+        if (!queenTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/bq.png") ||
+            !rookTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/br.png") ||
+            !bishopTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/bb.png") ||
+            !knightTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/bn.png")) {
+            return; // Obsłuż błąd ładowania
+        }
     }
 
-    // Remove pawn and replace with new piece
-    //removePiece(pawn->getBoardPosition().x, pawn->getBoardPosition().y);
-    b_pieces.push_back(newPiece);
+    // Utwórz sprite'y dla każdego typu figury
+    sf::Sprite queenSprite(queenTexture), rookSprite(rookTexture), bishopSprite(bishopTexture), knightSprite(knightTexture);
+
+    // Ustaw pozycje sprite'ów w nowym oknie
+    queenSprite.setPosition(50, 15);
+    rookSprite.setPosition(150, 15);
+    bishopSprite.setPosition(50, 105);
+    knightSprite.setPosition(150, 105);
+
+    // Pętla promocji
+    Piece* newPiece = nullptr;
+    bool promotionSelected = false;
+
+    while (promotionWindow.isOpen() && !promotionSelected) {
+        sf::Event event;
+        while (promotionWindow.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                promotionWindow.close();
+            } else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(promotionWindow);
+
+                // Sprawdź, który sprite został kliknięty
+                if (queenSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                    newPiece = new Queen(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
+                    promotionSelected = true;
+                } else if (rookSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                    newPiece = new Rook(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
+                    promotionSelected = true;
+                } else if (bishopSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                    newPiece = new Bishop(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
+                    promotionSelected = true;
+                } else if (knightSprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                    newPiece = new Knight(pawn->getColor(), pawn->getBoardPosition().x, pawn->getBoardPosition().y, this);
+                    promotionSelected = true;
+                }
+            }
+        }
+
+        // Rysowanie nowego okna
+        promotionWindow.clear();
+        promotionWindow.draw(queenSprite);
+        promotionWindow.draw(rookSprite);
+        promotionWindow.draw(bishopSprite);
+        promotionWindow.draw(knightSprite);
+        promotionWindow.display();
+    }
+
+    // Zamknij okno promocji po dokonaniu wyboru
+    promotionWindow.close();
+
+    // Zamień pionka na nową figurę
+    if (newPiece) {
+        b_pieces.push_back(newPiece);
+    }
 }
+
 
 
 
@@ -317,7 +360,7 @@ void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
 
     // Font do wyświetlania koordynatów
     sf::Font font;
-    if (!font.loadFromFile("/Users/kacpersztuka/Desktop/chess/Chess-Game/assets/fonts/Poppins-Thin.ttf")) {
+    if (!font.loadFromFile("/home/kacper/Pulpit/chess/assets/fonts/Poppins-Thin.ttf")) {
         // Obsługa błędu ładowania fontu
         return;
     }

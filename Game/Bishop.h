@@ -12,7 +12,6 @@ public:
     ~Bishop();
 
     void draw(sf::RenderWindow& window) override;
-    void move(int boardX, int boardY) override;
     bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;

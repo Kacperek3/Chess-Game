@@ -41,6 +41,5 @@ private:
     std::vector<Piece*> enemyPieces(int color) const;
     std::vector<Coordinate> getValidMoves(Piece* piece);
     std::vector<Coordinate> getValidCaptures(Piece* piece);
-    void simulateMove(Piece* piece, Coordinate targetPosition);
     void undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece);
 };

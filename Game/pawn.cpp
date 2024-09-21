@@ -105,7 +105,13 @@ void Pawn::move(int boardX, int boardY) {
     Piece::move(boardX, boardY);
     firstMove = false;
 
-    std::cout << "Pawn moved to: " << boardX << ", " << boardY << std::endl;
+    // Sprawdź, czy pionek doszedł do końca planszy
+    if (boardY == 0 || boardY == 7) {
+        board->promotePawn(this);
+        // Zastąp pionka królową
+        move(-1, -1);  // Usuń pionka z planszy
+        
+    }
 }
 
 Pawn::~Pawn() {}

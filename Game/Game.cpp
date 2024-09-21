@@ -65,13 +65,12 @@ void Game::processEvents() {
                         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
                         
                         
-                        // zmien turę po dozwolonym ruchu
                         if(board.isCheckmate(currentPlayerTurn)){
                             std::cout << "Szach" << std::endl;
                         }
                     }
                     else{
-                        draggedPiece->move(draggedPiece->getBoardPosition().x, draggedPiece->getBoardPosition().y);
+                        draggedPiece->simulateMove(draggedPiece->getBoardPosition().x, draggedPiece->getBoardPosition().y);
                     }
 
 
@@ -90,8 +89,12 @@ void Game::processEvents() {
 
 void Game::update() {
     
-    // Logika gry np. sprawdzanie ruchów, zmiana tur, AI itp.
-    
+    // usuwanie pionka, który doszedł do końca planszy
+    for(auto& piece : board.b_pieces){
+        if(piece->getPosition().x == -1 && piece->getPosition().y == -1){
+            board.removePiece(piece->getBoardPosition().x, piece->getBoardPosition().y);
+        }
+    }
     
 }
 

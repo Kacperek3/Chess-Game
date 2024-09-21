@@ -28,6 +28,7 @@ public:
     virtual ~Piece();
 
     virtual void draw(sf::RenderWindow& window) = 0;
+    virtual void simulateMove(int boardX, int boardY);
     virtual void move(int boardX, int boardY);
     virtual void move(sf::Vector2f newPosition);
     virtual bool isValidMove(int boardX, int boardY) = 0;

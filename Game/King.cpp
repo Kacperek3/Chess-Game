@@ -109,10 +109,6 @@ bool King::isValidMove(int boardX, int boardY) {
     return false;  // W innych przypadkach ruch jest niedozwolony
 }
 
-void King::move(int boardX, int boardY) {
-    Piece::move(boardX, boardY);
-}
-
 King::~King() {}
 
 void King::draw(sf::RenderWindow& window) {

@@ -12,7 +12,6 @@ public:
     ~Queen();
 
     void draw(sf::RenderWindow& window) override;
-    void move(int boardX, int boardY) override;
     bool isValidMove(int boardX, int boardY) override;
     bool isValidRookMove(int boardX, int boardY);
     bool isValidBishopMove(int boardX, int boardY);
