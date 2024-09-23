@@ -1,17 +1,18 @@
 #include "Board.h"
 
-Board::Board() {
+Board::Board(sf::RenderWindow* window) : window(window) {
+    
     // białe bierki
-    // czarne bierki
-    
     b_pieces.push_back(new King(BLACK, 4, 0, this));
-    b_pieces.push_back(new Pawn(BLACK, 1, 5, this));
-    
-    //b_pieces.push_back(new Pawn(WHITE, 3, 7, this));
+    b_pieces.push_back(new Queen(BLACK, 1, 5, this));
+    b_pieces.push_back(new Pawn(BLACK, 1, 1, this));
     //b_pieces.push_back(new Pawn(WHITE, 4, 7, this));
-    
+
+
+    //czarne bierki
+    b_pieces.push_back(new Rook(WHITE, 3, 7, this));
     b_pieces.push_back(new King(WHITE, 4, 7, this));
-    b_pieces.push_back(new Pawn(WHITE, 2, 2, this));
+    //b_pieces.push_back(new Pawn(WHITE, 2, 2, this));
 }
 
 
@@ -232,6 +233,34 @@ bool Board::isCheckmate(int color) {
 }
 
 
+
+bool Board::isStalemate(int color) {
+    if (isKingInCheck(color)) {
+        return false;
+    }
+
+    if (canKingMove(color)) {
+        return false;
+    }
+
+    // Sprawdź, czy jakakolwiek inna figura może się ruszyć lub zapobiec szachowi
+    for (Piece* piece : playerPieces(color)) {
+        std::vector<Coordinate> validMoves = piece->getPossibleMoves();
+        for (const auto& move : validMoves) {
+            // Sprawdz czy twoja bierka nie jest zwiazana
+            if (!isKingInCheckAfterMove(piece, move)) {
+                return false;  // jesli nie jest to znaczy ze moze sie ruszyc i jest to pat
+            }
+        }
+    }
+
+    return true;
+}
+
+
+
+
+
 void Board::promotePawn(Piece* pawn) {
     // Tworzenie nowego okna dla interfejsu promocji
     sf::RenderWindow promotionWindow(sf::VideoMode(270, 200), "Pawn Promotion");
@@ -242,14 +271,14 @@ void Board::promotePawn(Piece* pawn) {
            !rookTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wr.png") ||
            !bishopTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wb.png") ||
            !knightTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/wn.png")) {
-            return; // Obsłuż błąd ładowania
+            return; 
         }
     } else {
         if (!queenTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/bq.png") ||
             !rookTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/br.png") ||
             !bishopTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/bb.png") ||
             !knightTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/pieces/chessCom1/bn.png")) {
-            return; // Obsłuż błąd ładowania
+            return;
         }
     }
 
@@ -310,7 +339,7 @@ void Board::promotePawn(Piece* pawn) {
 }
 
 
-
+// funkcje odpowiedzialne za rysowanie planszy i bierki itp
 
 void Board::showPossibleMoves(sf::RenderWindow& window, Piece* piece){
     std::vector<Coordinate> possibleMoves = getValidMoves(piece);

@@ -178,6 +178,10 @@ std::vector<Coordinate> Queen::getPossibleCaptures() {
 
 
 bool Queen::isValidMove(int boardX, int boardY) {
+    if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
+        return false;  // Ruch poza planszę
+    }
+
     int deltaX = abs(boardX - boardPosition.x);
     int deltaY = abs(boardY - boardPosition.y);
 

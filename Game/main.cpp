@@ -6,11 +6,12 @@ int main() {
     
     return 0;
 }
-// todo pokazywanie mozliwych ruchow
 // todo roszada
 // todo pat
 // todo bicie w przelocie
-// todo promocja pionka
+
+
+
 // todo zapisywanie stanu gry
 // todo wczytywanie stanu gry
 // todo zegar

@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game() 
-: window(sf::VideoMode(800, 800), "Szachy"), board(), currentPlayerTurn(WHITE) {
+: window(sf::VideoMode(800, 800), "Szachy"), board(&window), currentPlayerTurn(WHITE) {
     // Inicjalizacja innych elementów, jeśli potrzeba
 }
 
@@ -55,18 +55,25 @@ void Game::processEvents() {
                     float snappedX = int(mousePosition.x / 75);
                     float snappedY = int(mousePosition.y / 75);
                     
+                    std::cout << board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY)) << std::endl;
+
 
                     if (draggedPiece->isValidMove(snappedX, snappedY) && !board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY))) {
                         if(board.isEnemyPieceAt(snappedX, snappedY, draggedPiece->getColor())){
                             std::cout << "Zbito" << std::endl;
                             board.removePiece(snappedX, snappedY);
                         }
+
                         draggedPiece->move(snappedX, snappedY);
                         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
                         
+
                         
                         if(board.isCheckmate(currentPlayerTurn)){
                             std::cout << "Szach" << std::endl;
+                        }
+                        if(board.isStalemate(currentPlayerTurn)){
+                            std::cout << "Pat" << std::endl;
                         }
                     }
                     else{
@@ -88,7 +95,7 @@ void Game::processEvents() {
 }
 
 void Game::update() {
-    
+
     // usuwanie pionka, który doszedł do końca planszy
     for(auto& piece : board.b_pieces){
         if(piece->getPosition().x == -1 && piece->getPosition().y == -1){

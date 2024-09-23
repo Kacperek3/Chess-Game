@@ -108,6 +108,9 @@ std::vector<Coordinate> Rook::getPossibleCaptures() {
 }
 
 bool Rook::isValidMove(int boardX, int boardY) {
+    if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
+        return false;  // Ruch poza planszę
+    }
     // Sprawdzenie, czy ruch jest w linii prostej (po osi X lub Y)
     if (boardX != boardPosition.x && boardY != boardPosition.y) {
         return false; // Ruch jest nieprawidłowy, bo wieża nie może poruszać się po skosie

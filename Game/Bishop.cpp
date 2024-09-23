@@ -109,6 +109,10 @@ std::vector<Coordinate> Bishop::getPossibleCaptures() {
 }
 
 bool Bishop::isValidMove(int boardX, int boardY) {
+    if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
+        return false;  // Ruch poza planszę
+    }
+
     int dx = abs(boardX - boardPosition.x);
     int dy = abs(boardY - boardPosition.y);
 

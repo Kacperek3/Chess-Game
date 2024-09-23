@@ -14,10 +14,10 @@ Pawn::Pawn(int color, int boardX, int boardY, Board* board)
     std::filesystem::path currentPath = std::filesystem::current_path().parent_path();
     std::string filePath;
 
-    if (color == 0) {
-        filePath = (currentPath / "assets/pieces/wPawn.png").string();
+    if (color == WHITE) {
+        filePath = (currentPath / "assets/pieces/chessCom1/wp.png").string();
     } else {
-        filePath = (currentPath / "assets/pieces/bPawn.png").string();
+        filePath = (currentPath / "assets/pieces/chessCom1/bp.png").string();
     }
 
     if (!texture.loadFromFile(filePath)) {
@@ -104,9 +104,14 @@ bool Pawn::isValidMove(int boardX, int boardY) {
 void Pawn::move(int boardX, int boardY) {
     Piece::move(boardX, boardY);
     firstMove = false;
-
     // Sprawdź, czy pionek doszedł do końca planszy
     if (boardY == 0 || boardY == 7) {
+        board->window->clear();  // Wyczyść okno
+        board->drawBoard(*board->window, false);  // Narysuj planszę
+        board->drawPieces(*board->window,this);  // Narysuj pionki
+        board->window->display();  // Update the window
+
+
         board->promotePawn(this);
         // Zastąp pionka królową
         move(-1, -1);  // Usuń pionka z planszy

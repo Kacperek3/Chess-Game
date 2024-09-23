@@ -11,10 +11,13 @@
 #include "Bishop.h"
 #include "Knight.h"
 
-
+class Game;
 class Board {
 public:
-    Board();  
+
+    sf::RenderWindow *window;
+
+    Board(sf::RenderWindow* window);  
     void draw(sf::RenderWindow& window, bool showCoordinates);  
     void drawPieces(sf::RenderWindow& window, Piece* draggedPiece);
     void drawBoard(sf::RenderWindow& window, bool showCoordinates);
@@ -32,10 +35,10 @@ public:
     void showPossibleCaptures(sf::RenderWindow& window, Piece* piece); // Pokazuje możliwe bicia dla przesuwanej bierki
     void markPieceField(sf::RenderWindow& window, Piece* piece); // Podkreśla przesuwaną bierkę
     void promotePawn(Piece* pawn);
-    
-
+    bool isStalemate(int color);
 
 private:
+    
     Piece* findKing(int color);
     std::vector<Piece*> playerPieces(int color);
     std::vector<Piece*> enemyPieces(int color) const;
