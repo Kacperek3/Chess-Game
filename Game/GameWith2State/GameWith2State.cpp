@@ -2,7 +2,7 @@
 
 GameWith2State::GameWith2State(GameStateManager* gsm, sf::RenderWindow* window)
     : gsm(gsm), window(window), board(window), currentPlayerTurn(WHITE) {
-    window->setFramerateLimit(60);
+    window->setFramerateLimit(200);
 }
 
 void GameWith2State::handleInput() {

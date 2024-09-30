@@ -2,7 +2,6 @@
 
 
 MenuState::MenuState(GameStateManager* gsm, sf::RenderWindow* window) : gsm(gsm), window(window) {
-    // Załaduj czcionkę
     if (!font.loadFromFile("fonts/Poppins-Thin.ttf")) {
         std::cerr << "Error loading font\n";
     }
@@ -10,6 +9,7 @@ MenuState::MenuState(GameStateManager* gsm, sf::RenderWindow* window) : gsm(gsm)
     if (!backgroundTexture.loadFromFile("Designer.png")) {
         std::cerr << "Error loading background image\n";
     }
+
 
     // Przypisz teksturę do sprite'a
     backgroundSprite.setTexture(backgroundTexture);

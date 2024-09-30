@@ -21,11 +21,8 @@ int main() {
 }
 
 // todo roszada
-// todo pat
 // todo bicie w przelocie
-
-
-
+// todo dodanie dzwieku do gry
 // todo zapisywanie stanu gry
 // todo wczytywanie stanu gry
 // todo zegar

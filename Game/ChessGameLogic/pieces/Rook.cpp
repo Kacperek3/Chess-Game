@@ -144,6 +144,11 @@ bool Rook::isValidMove(int boardX, int boardY) {
     return false;
 }
 
+void Rook::move(int boardX, int boardY) {
+    Piece::move(boardX, boardY);
+    firstMove = false;
+}
+
 Rook::~Rook() {}
 
 void Rook::draw(sf::RenderWindow& window) {

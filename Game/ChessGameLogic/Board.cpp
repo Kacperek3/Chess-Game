@@ -4,14 +4,16 @@ Board::Board(sf::RenderWindow* window) : window(window) {
     
     // białe bierki
     b_pieces.push_back(new King(BLACK, 4, 0, this));
-    b_pieces.push_back(new Queen(BLACK, 1, 5, this));
+    //b_pieces.push_back(new Queen(BLACK, 1, 5, this));
     b_pieces.push_back(new Pawn(BLACK, 0, 0, this));
     //b_pieces.push_back(new Pawn(WHITE, 4, 7, this));
 
 
     //czarne bierki
-    b_pieces.push_back(new Rook(WHITE, 3, 7, this));
+    b_pieces.push_back(new Rook(WHITE, 0, 7, this));
     b_pieces.push_back(new King(WHITE, 4, 7, this));
+    b_pieces.push_back(new Rook(WHITE, 7, 7, this));
+    b_pieces.push_back(new Bishop(WHITE, 2, 7, this));
     //b_pieces.push_back(new Pawn(WHITE, 2, 2, this));
 }
 
@@ -64,6 +66,16 @@ Piece* Board::findKing(int color) {
         }
     }
     return nullptr; // nigdy nie powinno dojść do tego miejsca w normalnej grze
+}
+
+
+Piece* Board::getPieceAt(int x, int y) {
+    for (auto& piece : b_pieces) {
+        if (piece->getBoardPosition().x == x && piece->getBoardPosition().y == y) {
+            return piece;
+        }
+    }
+    return nullptr;
 }
 
 bool Board::isWithinBounds(int x, int y) {

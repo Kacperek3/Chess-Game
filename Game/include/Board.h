@@ -36,6 +36,7 @@ public:
     void markPieceField(sf::RenderWindow& window, Piece* piece); // Podkreśla przesuwaną bierkę
     void promotePawn(Piece* pawn);
     bool isStalemate(int color);
+    Piece* getPieceAt(int x, int y);
 
 private:
     

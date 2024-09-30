@@ -55,6 +55,54 @@ std::vector<Coordinate> King::getPossibleMoves() {
         }
     }
 
+
+    if (isFirstMove()) {
+        if (getColor() == WHITE) {
+            // White kingside castling
+            if (board->isEmpty(5, boardPosition.y) && board->isEmpty(6, boardPosition.y) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(5, boardPosition.y)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(6, boardPosition.y))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(7, boardPosition.y));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    possibleMoves.push_back(Coordinate(6, boardPosition.y));  // Castling move
+                }
+            }
+
+            // White queenside castling
+            if (board->isEmpty(1, boardPosition.y) && board->isEmpty(2, boardPosition.y) &&
+                board->isEmpty(3, boardPosition.y) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(2, boardPosition.y)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(3, boardPosition.y))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(0, boardPosition.y));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    possibleMoves.push_back(Coordinate(2, boardPosition.y));  // Castling move
+                }
+            }
+        } else if (getColor() == BLACK) {
+            // Black kingside castling
+            if (board->isEmpty(5, boardPosition.y) && board->isEmpty(6, boardPosition.y) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(5, boardPosition.y)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(6, boardPosition.y))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(7, boardPosition.y));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    possibleMoves.push_back(Coordinate(6, boardPosition.y));  // Castling move
+                }
+            }
+
+            // Black queenside castling
+            if (board->isEmpty(1, boardPosition.y) && board->isEmpty(2, boardPosition.y) &&
+                board->isEmpty(3, boardPosition.y) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(2, boardPosition.y)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(3, boardPosition.y))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(0, boardPosition.y));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    possibleMoves.push_back(Coordinate(2, boardPosition.y));  // Castling move
+                }
+            }
+        }
+    }
+
+
     return possibleMoves;
 }
 
@@ -106,7 +154,70 @@ bool King::isValidMove(int boardX, int boardY) {
         }
     }
 
+    //roszada
+
+    if (isFirstMove() && deltaY == 0) {
+        if (getColor() == WHITE && boardX == 6 && boardY == this->boardPosition.y) {
+            // Check if squares between the king and the rook are empty and the king is not in check
+            if (board->isEmpty(5, boardY) && board->isEmpty(6, boardY) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(5, boardY)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(6, boardY))) {
+                // Check if the rook has not moved and is in the correct position
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(7, boardY));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    board->getPieceAt(7, boardY)->move(5, boardY);  // Move rook
+                    return true;
+                }
+            }
+        }
+
+        // Queenside castling (long castling)
+        if (getColor() == WHITE && boardX == 2 && boardY == this->boardPosition.y) {
+            if (board->isEmpty(1, boardY) && board->isEmpty(2, boardY) && board->isEmpty(3, boardY) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(2, boardY)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(3, boardY))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(0, boardY));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    board->getPieceAt(0, boardY)->move(3, boardY);  // Move rook
+                    return true;
+                }
+            }
+        }
+
+        // Kingside castling for black
+        if (getColor() == BLACK && boardX == 6 && boardY == this->boardPosition.y) {
+            if (board->isEmpty(5, boardY) && board->isEmpty(6, boardY) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(5, boardY)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(6, boardY))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(7, boardY));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    board->getPieceAt(7, boardY)->move(5, boardY);  // Move rook
+                    return true;
+                }
+            }
+        }
+
+        // Queenside castling for black
+        if (getColor() == BLACK && boardX == 2 && boardY == this->boardPosition.y) {
+            if (board->isEmpty(1, boardY) && board->isEmpty(2, boardY) && board->isEmpty(3, boardY) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(2, boardY)) &&
+                !board->isKingInCheckAfterMove(this, Coordinate(3, boardY))) {
+                Rook* rook = dynamic_cast<Rook*>(board->getPieceAt(0, boardY));
+                if (rook && rook->getType() == Piece::PieceType::Rook && rook->isFirstMove()) {
+                    board->getPieceAt(0, boardY)->move(3, boardY);  // Move rook
+                    return true;
+                }
+            }
+        }
+    }
+
+
     return false;  // W innych przypadkach ruch jest niedozwolony
+}
+
+void King::move(int boardX, int boardY) {
+    Piece::move(boardX, boardY);
+    firstMove = false;
 }
 
 King::~King() {}

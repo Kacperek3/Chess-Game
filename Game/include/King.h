@@ -8,6 +8,7 @@
 class King : public Piece {
 public:
     King(int color, int boardX, int boardY, Board* board);
+    void move(int boardX, int boardY) override;
     King();
     ~King();
 
@@ -15,7 +16,10 @@ public:
     bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+
+    bool isFirstMove() const { return firstMove; }
     
 private:
+    bool firstMove = true;
     
 };
