@@ -5,17 +5,21 @@
 #include <iostream>
 
 
-class Bishop : public Piece {
+
+class Pawn : public Piece {
 public:
-    Bishop(int color, int boardX, int boardY, Board* board);
-    Bishop();
-    ~Bishop();
+    Pawn(int color, int boardX, int boardY, Board* board);
+    Pawn();
+    ~Pawn();
 
     void draw(sf::RenderWindow& window) override;
     void move(int boardX, int boardY) override;
-    bool isValidMove(int boardX, int boardY);
+    bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
+    std::vector<Coordinate> getPossibleCaptures() override;
+    
     
 private:
+    bool firstMove = true;
     
 };

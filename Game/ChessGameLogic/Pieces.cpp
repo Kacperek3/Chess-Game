@@ -23,6 +23,12 @@ void Piece::move(sf::Vector2f newPosition) {
     sprite.setPosition(newPosition);
 }
 
+void Piece::simulateMove(int boardX, int boardY) {
+    m_position = Position(boardX, boardY).getPixelPosition();
+    boardPosition = Coordinate(boardX, boardY);
+    sprite.setPosition(m_position);
+}
+
 void Piece::move(int boardX, int boardY) {
     m_position = Position(boardX, boardY).getPixelPosition();
     boardPosition = Coordinate(boardX, boardY);

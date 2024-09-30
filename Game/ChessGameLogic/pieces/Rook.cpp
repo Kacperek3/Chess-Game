@@ -14,9 +14,9 @@ Rook::Rook(int color, int boardX, int boardY, Board* board)
     std::string filePath;
 
     if (color == 0) {
-        filePath = (currentPath / "assets/pieces/wRook.png").string();
+        filePath = (currentPath / "assets/pieces/chessCom1/wr.png").string();
     } else {
-        filePath = (currentPath / "assets/pieces/bRook.png").string();
+        filePath = (currentPath / "assets/pieces/chessCom1/br.png").string();
     }
 
     if (!texture.loadFromFile(filePath)) {
@@ -68,8 +68,49 @@ std::vector<Coordinate> Rook::getPossibleMoves() {
     return possibleMoves;
 }
 
+std::vector<Coordinate> Rook::getPossibleCaptures() {
+    std::vector<Coordinate> possibleCaptures;
+
+    // Kierunki ruchu wieży (pionowe i poziome)
+    int directions[4][2] = {
+        {1, 0},   // W prawo
+        {-1, 0},  // W lewo
+        {0, 1},   // W dół
+        {0, -1}   // W górę
+    };
+
+    // Sprawdzanie wszystkich kierunków
+    for (auto& direction : directions) {
+        int dx = direction[0];
+        int dy = direction[1];
+
+        int x = boardPosition.x;
+        int y = boardPosition.y;
+
+        while (true) {
+            x += dx;
+            y += dy;
+
+            if (board->isWithinBounds(x, y)) {
+                if (board->isEnemyPieceAt(x, y, m_color)) {
+                    possibleCaptures.push_back(Coordinate(x, y));
+                    break;  // Nie można kontynuować po napotkaniu bierki
+                } else if (!board->isEmpty(x, y)) {
+                    break;  // Napotkano własną bierkę, nie można kontynuować
+                }
+            } else {
+                break;  // Poza granicami planszy
+            }
+        }
+    }
+
+    return possibleCaptures;
+}
 
 bool Rook::isValidMove(int boardX, int boardY) {
+    if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
+        return false;  // Ruch poza planszę
+    }
     // Sprawdzenie, czy ruch jest w linii prostej (po osi X lub Y)
     if (boardX != boardPosition.x && boardY != boardPosition.y) {
         return false; // Ruch jest nieprawidłowy, bo wieża nie może poruszać się po skosie
@@ -97,7 +138,6 @@ bool Rook::isValidMove(int boardX, int boardY) {
     if (board->isEmpty(boardX, boardY)) {
         return true;
     } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
-        board->removePiece(boardX, boardY);  // Zbijamy przeciwnika
         return true;
     }
 
@@ -106,6 +146,7 @@ bool Rook::isValidMove(int boardX, int boardY) {
 
 void Rook::move(int boardX, int boardY) {
     Piece::move(boardX, boardY);
+    firstMove = false;
 }
 
 Rook::~Rook() {}
