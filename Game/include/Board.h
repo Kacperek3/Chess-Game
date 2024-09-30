@@ -38,6 +38,8 @@ public:
     void promotePawn(Piece* pawn);
     bool isStalemate(int color);
     Piece* getPieceAt(int x, int y);
+    void rotatePieces();
+
 
 private:
     

@@ -219,6 +219,10 @@ void King::move(int boardX, int boardY) {
     Piece::move(boardX, boardY);
     firstMove = false;
 }
+void King::rotatePiece() {
+    Piece::rotatePiece();
+}
+
 
 King::~King() {}
 

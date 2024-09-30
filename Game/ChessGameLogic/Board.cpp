@@ -5,7 +5,7 @@ Board::Board(sf::RenderWindow* window) : window(window) {
     // białe bierki
     b_pieces.push_back(new King(BLACK, 4, 0, this));
     //b_pieces.push_back(new Queen(BLACK, 1, 5, this));
-    b_pieces.push_back(new Pawn(BLACK, 0, 0, this));
+    b_pieces.push_back(new Pawn(BLACK, 0, 0, this, UP));
     //b_pieces.push_back(new Pawn(WHITE, 4, 7, this));
 
 
@@ -441,5 +441,14 @@ void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
                 window.draw(coordinates);
             }
         }
+    }
+}
+
+
+void Board::rotatePieces(){
+
+    for(auto& piece : b_pieces){
+        std::cout << piece->getBoardPosition().x << piece->getBoardPosition().y << std::endl;
+        piece->rotatePiece();
     }
 }

@@ -3,10 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include "Positions.h"
+#include <iostream>
 
 #define WHITE 0
 #define BLACK 1
 
+#define UP 1
+#define DOWN -1
 
 class Board;
 
@@ -34,6 +37,7 @@ public:
     virtual bool isValidMove(int boardX, int boardY) = 0;
     virtual std::vector<Coordinate> getPossibleMoves() = 0;
     virtual std::vector<Coordinate> getPossibleCaptures() = 0;
+    virtual void rotatePiece();
 
 
     sf::Sprite& getSprite();

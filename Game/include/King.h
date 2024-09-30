@@ -18,6 +18,7 @@ public:
     std::vector<Coordinate> getPossibleCaptures() override;
 
     bool isFirstMove() const { return firstMove; }
+    void rotatePiece() override;
     
 private:
     bool firstMove = true;

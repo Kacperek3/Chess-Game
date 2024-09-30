@@ -8,6 +8,7 @@
 class GameWith2State : public GameState {
 public:
     GameWith2State(GameStateManager* gsm, sf::RenderWindow* window);
+    ~GameWith2State();
 
 private:
     void handleInput() override;
@@ -15,8 +16,9 @@ private:
     void render() override;
 
     void startDragging(const sf::Vector2f& mousePosition);
-    void stopDragging(const sf::Vector2f& mousePosition);
+    void stopDragging(sf::Vector2f& mousePosition);
     void toggleCoordinates();
+    void rotateView();
     
     GameStateManager* gsm;
     sf::RenderWindow* window;
@@ -28,4 +30,5 @@ private:
     bool isDragging = false;
     Piece* draggedPiece = nullptr;
     bool showCoordinates = false;
+    bool isBoardRotated = false;
 };

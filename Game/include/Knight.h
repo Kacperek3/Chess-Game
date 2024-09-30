@@ -15,6 +15,7 @@ public:
     bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+    void rotatePiece() override;
     
 private:
     

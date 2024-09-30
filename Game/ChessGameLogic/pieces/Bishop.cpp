@@ -139,6 +139,10 @@ bool Bishop::isValidMove(int boardX, int boardY) {
     return false;  // W innych przypadkach ruch jest niedozwolony
 }
 
+void Bishop::rotatePiece() {
+    Piece::rotatePiece();
+}
+
 Bishop::~Bishop() {}
 
 void Bishop::draw(sf::RenderWindow& window) {

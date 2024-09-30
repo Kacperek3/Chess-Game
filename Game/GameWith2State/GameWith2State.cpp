@@ -5,6 +5,14 @@ GameWith2State::GameWith2State(GameStateManager* gsm, sf::RenderWindow* window)
     window->setFramerateLimit(200);
 }
 
+GameWith2State::~GameWith2State() {
+    // Resetowanie widoku przy zamknięciu stanu
+    sf::View view = window->getView();
+    view.setRotation(0);
+    window->setView(view);
+}
+
+
 void GameWith2State::handleInput() {
     sf::Event event;
     while (window->pollEvent(event)) {
@@ -53,7 +61,7 @@ void GameWith2State::startDragging(const sf::Vector2f& mousePosition) {
     }
 }
 
-void GameWith2State::stopDragging(const sf::Vector2f& mousePosition) {
+void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
     isDragging = false;
 
     float snappedX = int(mousePosition.x / 75);
@@ -61,7 +69,6 @@ void GameWith2State::stopDragging(const sf::Vector2f& mousePosition) {
     
     if (draggedPiece->isValidMove(snappedX, snappedY) && 
         !board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY))) {
-
         if (board.isEnemyPieceAt(snappedX, snappedY, draggedPiece->getColor())) {
             std::cout << "Zbito" << std::endl;
             board.removePiece(snappedX, snappedY);
@@ -69,13 +76,16 @@ void GameWith2State::stopDragging(const sf::Vector2f& mousePosition) {
 
         draggedPiece->move(snappedX, snappedY);
         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
-
+        
+        isBoardRotated = !isBoardRotated;
+        
         if (board.isCheckmate(currentPlayerTurn)) {
             std::cout << "Szach" << std::endl;
         }
         if (board.isStalemate(currentPlayerTurn)) {
             std::cout << "Pat" << std::endl;
         }
+        board.rotatePieces();
     } else {
         draggedPiece->simulateMove(draggedPiece->getBoardPosition().x, draggedPiece->getBoardPosition().y);
     }
@@ -99,8 +109,10 @@ void GameWith2State::update() {
 
 void GameWith2State::render() {
     window->clear();
-
+    //std::cout << isBoardRotated << std::endl;
+    
     board.drawBoard(*window, showCoordinates);
+    
 
     if (isDragging && draggedPiece) {
         board.showPossibleMoves(*window, draggedPiece);
@@ -111,6 +123,8 @@ void GameWith2State::render() {
         draggedPiece->move(mousePosition - dragOffset);
     }
     board.showCheck(*window, currentPlayerTurn);
+
+
     board.drawPieces(*window, draggedPiece);
     window->display();
 }

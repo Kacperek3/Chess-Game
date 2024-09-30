@@ -6,10 +6,11 @@ Pawn::Pawn() {
     
 }
 
-Pawn::Pawn(int color, int boardX, int boardY, Board* board)
+Pawn::Pawn(int color, int boardX, int boardY, Board* board, int direction)
     : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Pawn, boardX, boardY) 
 {
     this->board = board;
+    this->direction = direction;
     
     std::filesystem::path currentPath = std::filesystem::current_path().parent_path();
     std::string filePath;
@@ -32,7 +33,6 @@ Pawn::Pawn(int color, int boardX, int boardY, Board* board)
 
 std::vector<Coordinate> Pawn::getPossibleMoves() {
     std::vector<Coordinate> possibleMoves;
-    int direction = (m_color == WHITE) ? -1 : 1;  // Kierunek ruchu: do góry dla białych, na dół dla czarnych
 
     // Ruch do przodu o jedno pole
     if (board->isEmpty(boardPosition.x, boardPosition.y + direction)) {
@@ -61,7 +61,6 @@ std::vector<Coordinate> Pawn::getPossibleMoves() {
 
 std::vector<Coordinate> Pawn::getPossibleCaptures(){
     std::vector<Coordinate> possibleCaptures;
-    int direction = (m_color == WHITE) ? -1 : 1;  // Kierunek ruchu: do góry dla białych, na dół dla czarnych
 
     // Ruch po skosie (atak), jeśli na tym polu znajduje się figura przeciwnika
     if (board->isEnemyPieceAt(boardPosition.x + 1, boardPosition.y + direction, m_color)) {
@@ -75,7 +74,6 @@ std::vector<Coordinate> Pawn::getPossibleCaptures(){
 }
 
 bool Pawn::isValidMove(int boardX, int boardY) {
-    int direction = (m_color == WHITE) ? -1 : 1;  // Kierunek ruchu: do góry dla białych, na dół dla czarnych
     
     // Ruch do przodu o jedno pole
     if (boardX == boardPosition.x && boardY == boardPosition.y + direction) {
@@ -117,6 +115,11 @@ void Pawn::move(int boardX, int boardY) {
         move(-1, -1);  // Usuń pionka z planszy
         
     }
+}
+
+void Pawn::rotatePiece() {
+    Piece::rotatePiece();
+    direction *= -1;
 }
 
 Pawn::~Pawn() {}

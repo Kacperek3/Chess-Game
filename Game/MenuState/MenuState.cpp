@@ -2,11 +2,11 @@
 
 
 MenuState::MenuState(GameStateManager* gsm, sf::RenderWindow* window) : gsm(gsm), window(window) {
-    if (!font.loadFromFile("fonts/Poppins-Thin.ttf")) {
+    if (!font.loadFromFile("/home/kacper/Pulpit/chess/assets/fonts/Poppins-Thin.ttf")) {
         std::cerr << "Error loading font\n";
     }
 
-    if (!backgroundTexture.loadFromFile("Designer.png")) {
+    if (!backgroundTexture.loadFromFile("/home/kacper/Pulpit/chess/assets/Designer.png")) {
         std::cerr << "Error loading background image\n";
     }
 

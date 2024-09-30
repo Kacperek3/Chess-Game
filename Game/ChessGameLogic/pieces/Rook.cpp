@@ -148,6 +148,9 @@ void Rook::move(int boardX, int boardY) {
     Piece::move(boardX, boardY);
     firstMove = false;
 }
+void Rook::rotatePiece() {
+    Piece::rotatePiece();
+}
 
 Rook::~Rook() {}
 

@@ -17,6 +17,7 @@ public:
     bool isValidBishopMove(int boardX, int boardY);
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+    void rotatePiece() override;
     
 private:
     

@@ -245,6 +245,10 @@ bool Queen::isValidBishopMove(int boardX, int boardY) {
     return false;
 }
 
+void Queen::rotatePiece() {
+    Piece::rotatePiece();
+}
+
 Queen::~Queen() {}
 
 void Queen::draw(sf::RenderWindow& window) {

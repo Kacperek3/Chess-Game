@@ -113,6 +113,10 @@ bool Knight::isValidMove(int boardX, int boardY) {
     return false;  // W innych przypadkach ruch jest niedozwolony
 }
 
+void Knight::rotatePiece() {
+    Piece::rotatePiece();    
+}
+
 Knight::~Knight() {}
 
 void Knight::draw(sf::RenderWindow& window) {
