@@ -1,0 +1,26 @@
+#pragma once
+
+#include <memory>
+#include <stack>
+#include <SFML/Graphics.hpp>
+#include "GameStateManager.h"
+#include "AssetManager.h"
+#include "InputManager.h"
+
+
+struct GameData {
+    GameStateManager stateManager;
+    sf::RenderWindow window;
+    AssetManager assetManager;
+    InputManager inputManager;
+};
+
+typedef std::shared_ptr<GameData> GameDataRef;
+
+class Game {
+public:
+    Game(int width, int height, std::string title);
+private:
+    GameDataRef _data = std::make_shared<GameData>();
+    void Run();
+};

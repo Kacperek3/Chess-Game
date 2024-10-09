@@ -3,8 +3,10 @@
 
 class GameState {
 public:
-    virtual void handleInput() = 0;  // Obsługa wejścia
-    virtual void update() = 0;       // Aktualizacja stanu
-    virtual void render() = 0;  // Renderowanie
-    virtual ~GameState() = default;  // Wirtualny destruktor
+    virtual void Init() = 0;    
+    virtual void HandleInput() = 0;  
+    virtual void Update() = 0;       
+    virtual void Draw() = 0;  
+    virtual void Pause() {};
+    virtual void Resume() {};      
 };

@@ -1,23 +1,22 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <filesystem>
+#include "Game.h"
 #include "GameState.h"
-#include "GameStateManager.h"
-#include "GameWith2State.h"
-
 
 class MenuState : public GameState {
 public:
-    MenuState(GameStateManager* gsm, sf::RenderWindow* window);
+    MenuState(GameDataRef data);
+
+    void Init();
+
+    void HandleInput();
+    void Update(float dt);
+    void Draw(float dt);
+
 
 private:
-    void handleInput() override;
-    void update() override;
-    void render() override;
-
-    GameStateManager* gsm;
-    sf::RenderWindow* window;
+    
 
     sf::Font font;
     sf::Text playWithAiText;

@@ -1,7 +1,7 @@
 #include "MenuState.h"
 
 
-MenuState::MenuState(GameStateManager* gsm, sf::RenderWindow* window) : gsm(gsm), window(window) {
+MenuState::MenuState(GameDataRef data) : _data(data) {
     if (!font.loadFromFile("../assets/fonts/Poppins-Thin.ttf")) {
         std::cerr << "loading font\n";
     }
@@ -19,6 +19,11 @@ MenuState::MenuState(GameStateManager* gsm, sf::RenderWindow* window) : gsm(gsm)
     setupText(playByLanText, playByLanRect, "Play by LAN", 400);
     setupText(exitText, exitRect, "Exit", 550);
 }
+
+void Init(){
+
+}
+
 
 // Funkcja pomocnicza do ustawienia tekstu
 void MenuState::setupText(sf::Text& text, sf::RectangleShape& rect, const std::string& str, float yPos) {
@@ -63,7 +68,7 @@ void MenuState::handleInput() {
             if (playWith2Text.getGlobalBounds().contains(mousePos)) {
                 std::cout << "Play with 2 Players selected\n";
                 window->setSize(sf::Vector2u(800, 600));
-                gsm->pushState(new GameWith2State(gsm, window));
+                gsm->pushState(std::make_shared<GameWith2State>(&gsm, &window));
             }
 
             // Sprawdzanie, czy kliknięto w opcję "Play by LAN"
@@ -104,4 +109,5 @@ void MenuState::render() {
     window->draw(playWith2Text);
     window->draw(playByLanText);
     window->draw(exitText);
+    window->display();
 }

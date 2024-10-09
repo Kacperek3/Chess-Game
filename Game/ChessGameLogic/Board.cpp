@@ -1,6 +1,6 @@
 #include "Board.h"
 
-Board::Board(sf::RenderWindow* window) : window(window) {
+Board::Board(sf::RenderWindow* window) : window(window){
     
     // białe bierki
     b_pieces.push_back(new Rook(BLACK, 0, 0, this));
@@ -28,6 +28,22 @@ Board::Board(sf::RenderWindow* window) : window(window) {
     for(int i = 0; i < 8; i++){
         b_pieces.push_back(new Pawn(WHITE, i, 6, this, DOWN));
     }
+
+
+    if (!font.loadFromFile("../assets/fonts/Poppins-Thin.ttf")) {
+        return;
+    }
+
+    coordinates.setFont(font);
+    tile.setSize(sf::Vector2f(75, 75));
+    markedField.setSize(sf::Vector2f(75, 75));
+    sidePanel.setSize(sf::Vector2f(200,300));
+    circle.setRadius(10);
+
+    lightColor = sf::Color(255, 206, 158);
+    darkColor = sf::Color(209, 139, 71);
+    recColor = sf::Color(245, 90, 105, 128);
+    circleColor = sf::Color(183, 180, 180, 128);
 }
 
 
@@ -68,12 +84,6 @@ void Board::removePiece(int boardX, int boardY) {
         }
     }
 }
-
-
-
-
-
-
 
 
 
@@ -379,9 +389,7 @@ void Board::promotePawn(Piece* pawn) {
 
 void Board::showPossibleMoves(sf::RenderWindow& window, Piece* piece){
     std::vector<Coordinate> possibleMoves = getValidMoves(piece);
-    sf::Color circleColor(183, 180, 180, 128);
     for(auto& move : possibleMoves){
-        sf::CircleShape circle(10);
         circle.setFillColor(circleColor);
         circle.setPosition(move.x * 75 + 28, move.y * 75 + 28);
         window.draw(circle);
@@ -389,10 +397,8 @@ void Board::showPossibleMoves(sf::RenderWindow& window, Piece* piece){
 }
 
 void Board::showPossibleCaptures(sf::RenderWindow& window, Piece* piece){
-    sf::Color recColor(245, 90, 105, 128);
     std::vector<Coordinate> possibleCaptures = getValidCaptures(piece);
     for(auto& capture : possibleCaptures){
-        sf::RectangleShape markedField(sf::Vector2f(75, 75));
         markedField.setFillColor(recColor);
         markedField.setPosition(capture.x * 75, capture.y * 75);
         window.draw(markedField);
@@ -400,9 +406,7 @@ void Board::showPossibleCaptures(sf::RenderWindow& window, Piece* piece){
 }
 void Board::showCheck(sf::RenderWindow& window, int color){
     if(isKingInCheck(color)){
-        sf::Color recColor(245, 90, 105, 128);
         King* king = dynamic_cast<King*>(findKing(color));
-        sf::RectangleShape markedField(sf::Vector2f(75, 75));
         markedField.setFillColor(recColor);
         markedField.setPosition(king->getBoardPosition().x * 75, king->getBoardPosition().y * 75);
         window.draw(markedField);
@@ -410,8 +414,6 @@ void Board::showCheck(sf::RenderWindow& window, int color){
 }
 
 void Board::markPieceField(sf::RenderWindow& window, Piece* piece){
-    sf::Color recColor(223, 223, 103, 128);
-    sf::RectangleShape markedField(sf::Vector2f(75, 75));
     markedField.setFillColor(recColor);
     markedField.setPosition(piece->getBoardPosition().x * 75, piece->getBoardPosition().y * 75);
     window.draw(markedField);
@@ -430,19 +432,9 @@ void Board::drawPieces(sf::RenderWindow& window, Piece* draggedPiece) {
 
 
 void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
-    sf::Color lightColor(238, 238, 210); 
-    sf::Color darkColor(118, 150, 86); 
-
-    // Font do wyświetlania koordynatów
-    sf::Font font;
-    if (!font.loadFromFile("../assets/fonts/Poppins-Thin.ttf")) {
-        // Obsługa błędu ładowania fontu
-        return;
-    }
-
+    
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            sf::RectangleShape tile(sf::Vector2f(75, 75));
             tile.setPosition(col * 75, row * 75);
 
             // Kolorowanie kafelków
@@ -455,8 +447,6 @@ void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
 
             // Rysowanie koordynatów, jeśli showCoordinates jest true
             if (showCoordinates) {
-                sf::Text coordinates;
-                coordinates.setFont(font);
                 coordinates.setString(std::to_string(col) + " " + std::to_string(row));
                 coordinates.setCharacterSize(20);  // Rozmiar tekstu
                 coordinates.setFillColor(sf::Color::Black);  // Kolor tekstu
@@ -469,6 +459,8 @@ void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
             }
         }
     }
-    
+    sidePanel.setPosition(600, 0);
+    sidePanel.setFillColor(sf::Color(255, 255, 255));
+    window.draw(sidePanel);
 }
 

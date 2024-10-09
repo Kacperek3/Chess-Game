@@ -1,7 +1,7 @@
 #include "GameWith2State.h"
 
 GameWith2State::GameWith2State(GameStateManager* gsm, sf::RenderWindow* window)
-    : gsm(gsm), window(window), board(window), currentPlayerTurn(WHITE), sidePanel() {
+    : gsm(gsm), window(window), board(window), currentPlayerTurn(WHITE) {
 }
 
 GameWith2State::~GameWith2State() {
@@ -112,10 +112,7 @@ void GameWith2State::render() {
     window->setView(view);
     window->clear(sf::Color(40, 20, 2));
 
-    
     board.drawBoard(*window, showCoordinates);
-
-    sidePanel.draw(*window);
     
     if (isDragging && draggedPiece) {
         board.showPossibleMoves(*window, draggedPiece);
@@ -126,7 +123,7 @@ void GameWith2State::render() {
         draggedPiece->move(mousePosition - dragOffset);
     }
     board.showCheck(*window, currentPlayerTurn);
-
-
     board.drawPieces(*window, draggedPiece);
+    
+    window->display();
 }

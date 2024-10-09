@@ -1,21 +1,29 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <stack>
+#include <memory>
 #include <iostream>
+
 #include "GameState.h"
 
-class GameStateManager {
-private:
-    std::stack<GameState*> _states;  // Stos stanów
+typedef std::unique_ptr<GameState> StateRef;
 
+class GameStateManager {
 public:
-    bool destroyCurrentState = false;
-    void pushState(GameState* state);
-    void popState();
-    void closeAllStates();
-    void closePoppedStates();
-    GameState* getCurrentState();
-    void handleInput();
-    void update();
-    void render();
+    GameStateManager();
+    ~GameStateManager();
+
+    void AddState(StateRef newState, bool isReplacing = true);
+    void RemoveState();
+    void ProcessStateChanges();
+    StateRef &GetActiveState();
+    
+
+private:
+    std::stack<StateRef> _states;
+    StateRef _newState;
+
+    bool _isRemoving;
+    bool _isAdding;
+    bool _isReplacing;
 };

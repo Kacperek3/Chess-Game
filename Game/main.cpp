@@ -1,23 +1,10 @@
-#include "GameStateManager.h"
-#include "MenuState.h"
-#include "GameWith2State.h"
+#include <iostream>
+#include "Game.h"
+
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 800), "Chess");
-    GameStateManager gsm;
+    Game(800, 600, "Chess");
     
-    window.setFramerateLimit(150);
-    
-    gsm.pushState(new MenuState(&gsm, &window));
-
-    while (window.isOpen()) {
-        gsm.handleInput(); 
-        gsm.closePoppedStates();
-        gsm.update();       
-        gsm.render();
-        window.display();
-    }
-    gsm.closeAllStates();
     return 0;
 }
 

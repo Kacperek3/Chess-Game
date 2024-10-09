@@ -11,6 +11,7 @@
 #include "Bishop.h"
 #include "Knight.h"
 
+
 class Board {
 public:
 
@@ -51,4 +52,22 @@ private:
     std::vector<Coordinate> getValidMoves(Piece* piece);
     std::vector<Coordinate> getValidCaptures(Piece* piece);
     void undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece);
+
+
+
+
+    // funkcje odpowiedzialne za rysowanie planszy i bierki itp
+    sf::Color lightColor; 
+    sf::Color darkColor; 
+    sf::Color recColor;
+    sf::Color circleColor;
+    sf::Font font;
+    sf::Text coordinates;
+
+    sf::RectangleShape tile;
+    sf::RectangleShape markedField;
+    sf::RectangleShape sidePanel;
+    sf::CircleShape circle;
+
+
 };

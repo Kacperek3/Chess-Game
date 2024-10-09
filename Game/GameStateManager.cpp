@@ -1,51 +1,38 @@
 #include "GameStateManager.h"
 
-void GameStateManager::pushState(GameState* state) {
-    _states.push(state);
+void GameStateManager::AddState(StateRef newState, bool isReplacing) {
+    _isAdding = true;
+    _isReplacing = isReplacing;
+    _newState = std::move(newState);
 }
 
-void GameStateManager::popState() {
-    if (!_states.empty()) {
-        delete _states.top();  // Usuń bieżący stan
+void GameStateManager::RemoveState() {
+    _isRemoving = true;
+}
+
+void GameStateManager::ProcessStateChanges() {
+    if (_isRemoving && !_states.empty()) {
         _states.pop();
+        if (!_states.empty()) {
+            _states.top()->Resume();
+        }
+        _isRemoving = false;
+    }
+
+    if (_isAdding) {
+        if (!_states.empty()) {
+            if (_isReplacing) {
+                _states.pop();
+            } else {
+                _states.top()->Pause();
+            }
+        }
+        _states.push(std::move(_newState));
+        _states.top()->Init();
+        _isAdding = false;
     }
 }
 
-void GameStateManager::closeAllStates() {
-    while (!_states.empty()) {
-        delete _states.top();  // Usuń bieżący stan
-        _states.pop();
-    }
-}
-
-void GameStateManager::closePoppedStates() {
-    if (destroyCurrentState) {
-        popState();
-        destroyCurrentState = false;
-    }
-}
-
-GameState* GameStateManager::getCurrentState() {
-    if (!_states.empty()) {
-        return _states.top();  // Zwróć bieżący stan
-    }
-    return nullptr;
-}
-
-void GameStateManager::handleInput() {
-    if (getCurrentState()) {
-        getCurrentState()->handleInput();  // Obsłuż wejście dla bieżącego stanu
-    }
-}
-
-void GameStateManager::update() {
-    if (getCurrentState()) {
-        getCurrentState()->update();  // Aktualizuj bieżący stan
-    }
-}
-
-void GameStateManager::render() {
-    if (getCurrentState()) {
-        getCurrentState()->render();  // Renderuj bieżący stan
-    }
+StateRef &GameStateManager::GetActiveState() {
+    return _states.top();
 }
