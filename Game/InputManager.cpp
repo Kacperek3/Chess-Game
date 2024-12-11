@@ -20,6 +20,7 @@ bool InputManager::IsTextClicked(sf::Text text, sf::Mouse::Button button, sf::Re
     return false;
 }
 
-sf::Vector2i InputManager::GetMousePosition(sf::RenderWindow &window) {
-    return sf::Mouse::getPosition(window);
+sf::Vector2f InputManager::GetMousePosition(sf::RenderWindow &window) {
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+    return window.mapPixelToCoords(mousePosition);
 }

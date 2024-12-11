@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-class GameState {
+class State {
 public:
     virtual void Init() = 0;    
     virtual void HandleInput() = 0;  

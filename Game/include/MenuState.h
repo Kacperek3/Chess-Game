@@ -2,20 +2,21 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Game.h"
-#include "GameState.h"
+#include "State.h"
 
-class MenuState : public GameState {
+class MenuState : public State {
 public:
     MenuState(GameDataRef data);
 
     void Init();
 
-    void HandleInput();
-    void Update(float dt);
-    void Draw(float dt);
+    void HandleInput() override;
+    void Update() override;
+    void Draw() override;
 
 
 private:
+    GameDataRef _data;
     
 
     sf::Font font;

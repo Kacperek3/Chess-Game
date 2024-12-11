@@ -2,29 +2,18 @@
 
 
 MenuState::MenuState(GameDataRef data) : _data(data) {
-    if (!font.loadFromFile("../assets/fonts/Poppins-Thin.ttf")) {
-        std::cerr << "loading font\n";
-    }
+    _data->assetManager.LoadTexture("Background", "../assets/Designer.png");
+    _data->assetManager.LoadFont("Poppins-Thin", "../assets/fonts/Poppins-Thin.ttf");
 
-    if (!backgroundTexture.loadFromFile("../assets/Designer.png")) {
-        std::cerr << "Error loading background image\n";
-    }
-
-
-    // Przypisz teksturę do sprite'a
-    backgroundSprite.setTexture(backgroundTexture);
-
-    setupText(playWithAiText, playWithAiRect, "Play with AI", 100);
-    setupText(playWith2Text, playWith2Rect, "Play with 2 Players", 250);
-    setupText(playByLanText, playByLanRect, "Play by LAN", 400);
-    setupText(exitText, exitRect, "Exit", 550);
+    backgroundSprite.setTexture(_data->assetManager.GetTexture("Background"));
+    font = _data->assetManager.GetFont("Poppins-Thin");
 }
 
 void Init(){
 
 }
 
-
+/*
 // Funkcja pomocnicza do ustawienia tekstu
 void MenuState::setupText(sf::Text& text, sf::RectangleShape& rect, const std::string& str, float yPos) {
     text.setFont(font);
@@ -46,19 +35,20 @@ void MenuState::checkMouseHover(const sf::Vector2f& mousePos, sf::Text& text, sf
         text.setFillColor(hoverColor);
         text.setFillColor(sf::Color::Black);
     }
-}
+} */
 
-void MenuState::handleInput() {
+void MenuState::HandleInput() {
     sf::Event event;
-    while (window->pollEvent(event)) {
+    while (_data->window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
-            window->close();
+            _data->window.close();
             return;
         }
 
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-            sf::Vector2f mousePos = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
+            sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
 
+            /*
             // Sprawdzanie, czy kliknięto w opcję "Play with AI"
             if (playWithAiText.getGlobalBounds().contains(mousePos)) {
                 std::cout << "Play with AI selected\n";
@@ -67,8 +57,8 @@ void MenuState::handleInput() {
             // Sprawdzanie, czy kliknięto w opcję "Play with 2 Players"
             if (playWith2Text.getGlobalBounds().contains(mousePos)) {
                 std::cout << "Play with 2 Players selected\n";
-                window->setSize(sf::Vector2u(800, 600));
-                gsm->pushState(std::make_shared<GameWith2State>(&gsm, &window));
+                //window->setSize(sf::Vector2u(800, 600));
+                // gsm->pushState(std::make_shared<GameWith2State>(&gsm, &window));
             }
 
             // Sprawdzanie, czy kliknięto w opcję "Play by LAN"
@@ -78,36 +68,30 @@ void MenuState::handleInput() {
 
             // Sprawdzanie, czy kliknięto w opcję "Exit"
             if (exitText.getGlobalBounds().contains(mousePos)) {
-                window->close();
+                std::cout << "Play by LAN selected\n";
+
+                //_data->window.close();
                 return;
-            }
+            }*/
+
         }
     }
 }
 
-void MenuState::update() {
-    sf::Vector2f mousePos = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
-
+void MenuState::Update() {
+    sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
+    
+    /*
     // Sprawdzaj, czy myszka najeżdża na opcję i zmieniaj kolor tekstu
     checkMouseHover(mousePos, playWithAiText, playWithAiRect);
     checkMouseHover(mousePos, playWith2Text, playWith2Rect);
     checkMouseHover(mousePos, playByLanText, playByLanRect);
-    checkMouseHover(mousePos, exitText, exitRect);
+    checkMouseHover(mousePos, exitText, exitRect);*/
 }
 
-void MenuState::render() {
-    window->clear();
-    window->draw(backgroundSprite);
+void MenuState::Draw() {
+    _data->window.clear();
+    _data->window.draw(backgroundSprite);
 
-    // Rysowanie opcji ushenu
-    window->draw(playWithAiRect);
-    window->draw(playWith2Rect);
-    window->draw(playByLanRect);
-    window->draw(exitRect);
-
-    window->draw(playWithAiText);
-    window->draw(playWith2Text);
-    window->draw(playByLanText);
-    window->draw(exitText);
-    window->display();
+    _data->window.display();
 }

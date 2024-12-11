@@ -4,9 +4,9 @@
 #include <memory>
 #include <iostream>
 
-#include "GameState.h"
+#include "State.h"
 
-typedef std::unique_ptr<GameState> StateRef;
+typedef std::unique_ptr<State> StateRef;
 
 class GameStateManager {
 public:
