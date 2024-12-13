@@ -12,12 +12,12 @@ void GameWith2State::Init(){
     draggedPiece = nullptr;
     dragOffset = sf::Vector2f(0, 0);
 
-
-
     //rysowanie pozostałych elementów
-    sidePanel.setSize(sf::Vector2f(200,300));
-    sidePanel.setPosition(600, 0);
-    sidePanel.setFillColor(sf::Color(255, 255, 255));
+
+    _data->assetManager.LoadTexture("START_BUTTON", "../assets/GameWithFriendState/Buttons/StartButton.png");
+    _data->assetManager.LoadTexture("START_BUTTON_HOVER", "../assets/GameWithFriendState/Buttons/StartButton_hover.png");
+    _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
+    _startButton.setPosition(600, 271);
 }
 
 GameWith2State::~GameWith2State() {
@@ -129,6 +129,13 @@ void GameWith2State::Update() {
             _board.removePiece(piece->getBoardPosition().x, piece->getBoardPosition().y);
         }
     }
+
+    if(_data->inputManager.IsSpriteHover(_startButton, sf::Mouse::Left, _data->window)){
+        _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON_HOVER"));
+    } else {
+        _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
+    }
+
 }
 
 void GameWith2State::Draw() {
@@ -151,7 +158,8 @@ void GameWith2State::Draw() {
     _board.drawPieces(_data->window, draggedPiece);
     
 
-    _data->window.draw(sidePanel);
+   // _data->window.draw(sidePanel);
+    _data->window.draw(_startButton);
 
     _data->window.display();
 }

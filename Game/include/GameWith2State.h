@@ -37,8 +37,7 @@ private:
 
 
     //rysowanie pozotalych elementow 
-    sf::RectangleShape sidePanel;
-
+    sf::Sprite _startButton;
 
 
 
