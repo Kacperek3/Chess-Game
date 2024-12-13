@@ -37,7 +37,6 @@ Board::Board(sf::RenderWindow* window) : window(window){
     coordinates.setFont(font);
     tile.setSize(sf::Vector2f(75, 75));
     markedField.setSize(sf::Vector2f(75, 75));
-    sidePanel.setSize(sf::Vector2f(200,300));
     circle.setRadius(10);
 
     lightColor = sf::Color(255, 206, 158);
@@ -459,8 +458,5 @@ void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
             }
         }
     }
-    sidePanel.setPosition(600, 0);
-    sidePanel.setFillColor(sf::Color(255, 255, 255));
-    window.draw(sidePanel);
 }
 

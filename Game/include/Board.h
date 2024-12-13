@@ -66,7 +66,7 @@ private:
 
     sf::RectangleShape tile;
     sf::RectangleShape markedField;
-    sf::RectangleShape sidePanel;
+    
     sf::CircleShape circle;
 
 

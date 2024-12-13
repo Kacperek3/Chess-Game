@@ -11,6 +11,13 @@ void GameWith2State::Init(){
     isDragging = false;
     draggedPiece = nullptr;
     dragOffset = sf::Vector2f(0, 0);
+
+
+
+    //rysowanie pozostałych elementów
+    sidePanel.setSize(sf::Vector2f(200,300));
+    sidePanel.setPosition(600, 0);
+    sidePanel.setFillColor(sf::Color(255, 255, 255));
 }
 
 GameWith2State::~GameWith2State() {
@@ -28,12 +35,11 @@ void GameWith2State::HandleInput() {
                 break;
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::R) {
+                    //wlaczenie i wylaczenie wspolrzednych
                     toggleCoordinates();
                 }
-                else if (event.key.code == sf::Keyboard::L) {
-                    _data->stateManager.RemoveState();
-                }
                 else if(event.key.code == sf::Keyboard::Escape){
+                    //powrot do menu
                     std::cout << "Escape" << std::endl;
                     _data->stateManager.AddState(StateRef(new MenuState(_data)), false);
                     return;
@@ -42,12 +48,21 @@ void GameWith2State::HandleInput() {
 
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
+                    //rozpoczecie przesuwania pionka
                     sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
                     startDragging(mousePos);
+                }
+                else if(event.mouseButton.button == sf::Mouse::Right and isDragging){
+                    //przywracanie pionka na miejsce po kliknieciu prawym przyciskiem myszy
+                    draggedPiece->simulateMove(draggedPiece->getBoardPosition().x, draggedPiece->getBoardPosition().y);
+                    isDragging = false;
+                    draggedPiece = nullptr;
+                    dragOffset = sf::Vector2f(0, 0);
                 }
                 break;
 
             case sf::Event::MouseButtonReleased:
+                //koniec przesuwania pionka
                 if (event.mouseButton.button == sf::Mouse::Left && isDragging) {
                     sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
                     stopDragging(mousePos);
@@ -62,7 +77,7 @@ void GameWith2State::HandleInput() {
 
 void GameWith2State::startDragging(const sf::Vector2f& mousePosition) {
     for (auto& piece : _board.b_pieces) {
-        if (piece->getSprite().getGlobalBounds().contains(mousePosition) && piece->getColor() == currentPlayerTurn) {
+        if (_data->inputManager.IsSpriteHoverAccurate(piece->getSprite(), sf::Mouse::Left, _data->window) && piece->getColor() == currentPlayerTurn) {
             isDragging = true;
             draggedPiece = dynamic_cast<Piece*>(piece);
             dragOffset = mousePosition - draggedPiece->getPosition();
@@ -135,5 +150,8 @@ void GameWith2State::Draw() {
     _board.showCheck(_data->window, currentPlayerTurn);
     _board.drawPieces(_data->window, draggedPiece);
     
+
+    _data->window.draw(sidePanel);
+
     _data->window.display();
 }

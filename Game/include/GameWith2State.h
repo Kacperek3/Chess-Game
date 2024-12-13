@@ -33,4 +33,13 @@ private:
     Piece* draggedPiece = nullptr;
     bool showCoordinates = false;
     bool isBoardRotated = false;
+
+
+
+    //rysowanie pozotalych elementow 
+    sf::RectangleShape sidePanel;
+
+
+
+
 };
