@@ -1,50 +1,70 @@
 #include "Board.h"
 
-Board::Board(sf::RenderWindow* window) : window(window){
-    
+
+Board::Board(GameDataRef data) : _data(data), window(window) {
+
+}
+
+
+void Board::Init() {
+    // do nothing
+    _data->assetManager.LoadTexture("wk", "../assets/pieces/chessCom1/wk.png");
+    _data->assetManager.LoadTexture("bk", "../assets/pieces/chessCom1/bk.png");
+
     // białe bierki
-    b_pieces.push_back(new Rook(BLACK, 0, 0, this));
-    b_pieces.push_back(new Knight(BLACK, 1, 0, this));
-    b_pieces.push_back(new Bishop(BLACK, 2, 0, this));
-    b_pieces.push_back(new Queen(BLACK, 3, 0, this));
-    b_pieces.push_back(new King(BLACK, 4, 0, this));
-    b_pieces.push_back(new Bishop(BLACK, 5, 0, this));
-    b_pieces.push_back(new Knight(BLACK, 6, 0, this));
-    b_pieces.push_back(new Rook(BLACK, 7, 0, this));
+    //b_pieces.push_back(new Rook(BLACK, 0, 0, this));
+    //b_pieces.push_back(new Knight(BLACK, 1, 0, this));
+    //b_pieces.push_back(new Bishop(BLACK, 2, 0, this));
+    //b_pieces.push_back(new Queen(BLACK, 3, 0, this));
+    b_pieces.push_back(new King(BLACK, 4, 0, this, _data->assetManager.GetTexture("bk")));
+    //b_pieces.push_back(new Bishop(BLACK, 5, 0, this));
+    //b_pieces.push_back(new Knight(BLACK, 6, 0, this));
+    //b_pieces.push_back(new Rook(BLACK, 7, 0, this));
     for(int i = 0; i < 8; i++){
-        b_pieces.push_back(new Pawn(BLACK, i, 1, this, UP));
+       // b_pieces.push_back(new Pawn(BLACK, i, 1, this, UP));
     }
 
 
     //czarne bierki
-    b_pieces.push_back(new Rook(WHITE, 0, 7, this));
-    b_pieces.push_back(new Knight(WHITE, 1, 7, this));
-    b_pieces.push_back(new Bishop(WHITE, 2, 7, this));
-    b_pieces.push_back(new Queen(WHITE, 3, 7, this));
-    b_pieces.push_back(new King(WHITE, 4, 7, this));
-    b_pieces.push_back(new Bishop(WHITE, 5, 7, this));
-    b_pieces.push_back(new Knight(WHITE, 6, 7, this));
-    b_pieces.push_back(new Rook(WHITE, 7, 7, this));
+    //b_pieces.push_back(new Rook(WHITE, 0, 7, this));
+    //b_pieces.push_back(new Knight(WHITE, 1, 7, this));
+    //b_pieces.push_back(new Bishop(WHITE, 2, 7, this));
+    //b_pieces.push_back(new Queen(WHITE, 3, 7, this));
+    b_pieces.push_back(new King(WHITE, 4, 7, this, _data->assetManager.GetTexture("wk")));
+    //b_pieces.push_back(new Bishop(WHITE, 5, 7, this));
+    //b_pieces.push_back(new Knight(WHITE, 6, 7, this));
+    //b_pieces.push_back(new Rook(WHITE, 7, 7, this));
     for(int i = 0; i < 8; i++){
-        b_pieces.push_back(new Pawn(WHITE, i, 6, this, DOWN));
+        //b_pieces.push_back(new Pawn(WHITE, i, 6, this, DOWN));
     }
+    tile = new sf::RectangleShape(sf::Vector2f(75, 75));
+    recColor = new sf::Color(245, 90, 105, 128);
+    circleColor = new sf::Color(183, 180, 180, 128);
 
-
-    if (!font.loadFromFile("../assets/fonts/Poppins-Thin.ttf")) {
-        return;
-    }
-
-    coordinates.setFont(font);
-    tile.setSize(sf::Vector2f(75, 75));
-    markedField.setSize(sf::Vector2f(75, 75));
-    circle.setRadius(10);
-
-    lightColor = sf::Color(255, 206, 158);
-    darkColor = sf::Color(209, 139, 71);
-    recColor = sf::Color(245, 90, 105, 128);
-    circleColor = sf::Color(183, 180, 180, 128);
+    markedField = new sf::RectangleShape(sf::Vector2f(75, 75));
+    circle = new sf::CircleShape(10);
 }
 
+
+void Board::deleteObjects(){
+    for(auto& piece : b_pieces){
+        delete piece;
+    }
+    
+    delete tile;
+    delete markedField;
+    delete circle;
+    delete recColor;
+    delete circleColor;
+    //delete lightColor;
+    //delete darkColor;
+    
+    b_pieces.clear();
+}
+
+Board::~Board() {
+    std::cout << "Usunieto board" << std::endl;
+}
 
 bool Board::isEmpty(int x, int y) {
     for (auto& piece : b_pieces) {
@@ -206,6 +226,9 @@ bool Board::isKingInCheckAfterMove(Piece* movedPiece, Coordinate targetPosition)
 
 bool Board::isKingInCheck(int color) {
     King* king = dynamic_cast<King*>(findKing(color));
+    if(king == nullptr){
+        std::cout << "Nie znaleziono krola" << std::endl;
+    }
     Coordinate kingPosition = king->getBoardPosition();
 
     for (auto& piece : b_pieces) {
@@ -389,33 +412,33 @@ void Board::promotePawn(Piece* pawn) {
 void Board::showPossibleMoves(sf::RenderWindow& window, Piece* piece){
     std::vector<Coordinate> possibleMoves = getValidMoves(piece);
     for(auto& move : possibleMoves){
-        circle.setFillColor(circleColor);
-        circle.setPosition(move.x * 75 + 28, move.y * 75 + 28);
-        window.draw(circle);
+        circle->setFillColor(*circleColor);
+        circle->setPosition(move.x * 75 + 28, move.y * 75 + 28);
+        window.draw(*circle);
     }
 }
 
 void Board::showPossibleCaptures(sf::RenderWindow& window, Piece* piece){
     std::vector<Coordinate> possibleCaptures = getValidCaptures(piece);
     for(auto& capture : possibleCaptures){
-        markedField.setFillColor(recColor);
-        markedField.setPosition(capture.x * 75, capture.y * 75);
-        window.draw(markedField);
+        markedField->setFillColor(*recColor);
+        markedField->setPosition(capture.x * 75, capture.y * 75);
+        window.draw(*markedField);
     }
 }
 void Board::showCheck(sf::RenderWindow& window, int color){
     if(isKingInCheck(color)){
         King* king = dynamic_cast<King*>(findKing(color));
-        markedField.setFillColor(recColor);
-        markedField.setPosition(king->getBoardPosition().x * 75, king->getBoardPosition().y * 75);
-        window.draw(markedField);
+        markedField->setFillColor(*recColor);
+        markedField->setPosition(king->getBoardPosition().x * 75, king->getBoardPosition().y * 75);
+        window.draw(*markedField);
     }
 }
 
 void Board::markPieceField(sf::RenderWindow& window, Piece* piece){
-    markedField.setFillColor(recColor);
-    markedField.setPosition(piece->getBoardPosition().x * 75, piece->getBoardPosition().y * 75);
-    window.draw(markedField);
+    markedField->setFillColor(*recColor);
+    markedField->setPosition(piece->getBoardPosition().x * 75, piece->getBoardPosition().y * 75);
+    window.draw(*markedField);
 }
 
 void Board::drawPieces(sf::RenderWindow& window, Piece* draggedPiece) {
@@ -429,34 +452,26 @@ void Board::drawPieces(sf::RenderWindow& window, Piece* draggedPiece) {
     }
 }
 
-
 void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
-    
+    sf::Color *lightColor = new sf::Color(255, 206, 158);
+    sf::Color *darkColor = new sf::Color(209, 139, 71);
+
+
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            tile.setPosition(col * 75, row * 75);
+            
+            tile->setPosition(col * 75, row * 75);
 
             // Kolorowanie kafelków
             if ((row + col) % 2 == 0) {
-                tile.setFillColor(lightColor); 
+                tile->setFillColor(*lightColor); 
             } else {
-                tile.setFillColor(darkColor);
+                tile->setFillColor(*darkColor);
             }
-            window.draw(tile);
-
-            // Rysowanie koordynatów, jeśli showCoordinates jest true
-            if (showCoordinates) {
-                coordinates.setString(std::to_string(col) + " " + std::to_string(row));
-                coordinates.setCharacterSize(20);  // Rozmiar tekstu
-                coordinates.setFillColor(sf::Color::Black);  // Kolor tekstu
-
-                // Pozycjonowanie tekstu na środku pola
-                coordinates.setPosition(col * 75 + 20, row * 75 + 20); 
-
-                // Rysowanie tekstu
-                window.draw(coordinates);
-            }
+            window.draw(*tile);
         }
     }
+    delete lightColor;
+    delete darkColor;
 }
 

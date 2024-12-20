@@ -3,26 +3,26 @@
 #include "Game.h"
 #include "State.h"
 
-class MenuState : public State {
+class testState : public State {
 public:
-    MenuState(GameDataRef data);
+    testState(GameDataRef data);
     void Init() override;
 
     void HandleInput() override;
     void Update() override;
     void Draw() override;
-    void ClearObjects() override;
 
 
 private:
     GameDataRef _data;
     
     sf::Font _font;
-    
+    sf::Text _textField;
+    std::string inputText = "";
 
-    sf::Sprite _backgroundSprite;     // Sprite tła
-    sf::Sprite _playWithFriendSprite;    
-    sf::Sprite _playWithAISprite;      // Sprite przycisku "Play with AI"
+    sf::RectangleShape *_rec;
+
+   // sf::RectangleShape _rec;
 
     void UpdateSpriteTexture(sf::Sprite& sprite, const std::string& normalTexture, const std::string& hoverTexture);
 };

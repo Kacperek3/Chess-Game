@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "MenuState.h"
+#include "testState.h"
 
 Game::Game(int width, int height, std::string title) {
     _data->window.create(sf::VideoMode(width, height), title, sf::Style::Close | sf::Style::Titlebar);

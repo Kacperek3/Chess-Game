@@ -9,4 +9,5 @@ public:
     virtual void Draw() = 0;  
     virtual void Pause() {};
     virtual void Resume() {};      
+    virtual void ClearObjects() {};      
 };

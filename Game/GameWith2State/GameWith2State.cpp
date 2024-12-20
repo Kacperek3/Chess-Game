@@ -1,9 +1,10 @@
 #include "GameWith2State.h"
 #include "MenuState.h"
 
-GameWith2State::GameWith2State(GameDataRef data): _data(data), _board(&data->window) {
-    
+GameWith2State::GameWith2State(GameDataRef data): _data(data), _board(data) {
 }
+
+
 
 void GameWith2State::Init(){
     currentPlayerTurn = WHITE;
@@ -12,18 +13,43 @@ void GameWith2State::Init(){
     draggedPiece = nullptr;
     dragOffset = sf::Vector2f(0, 0);
 
+    _board.Init();
+
     //rysowanie pozostałych elementów
 
     _data->assetManager.LoadTexture("START_BUTTON", "../assets/GameWithFriendState/Buttons/StartButton.png");
     _data->assetManager.LoadTexture("START_BUTTON_HOVER", "../assets/GameWithFriendState/Buttons/StartButton_hover.png");
     _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
     _startButton.setPosition(600, 271);
-}
 
-GameWith2State::~GameWith2State() {
-    
-}
 
+
+    _data->assetManager.LoadFont("Poppins", "../assets/fonts/Poppins-Thin.ttf");
+    _font = _data->assetManager.GetFont("Poppins");
+
+
+
+
+    for(auto texture : _data->assetManager._textures){
+        std::cout << texture.first << std::endl;
+    }
+
+    _textField = std::make_unique<sf::Text>();
+    _textField->setFont(_font);
+    _textField->setCharacterSize(24);
+    _textField->setFillColor(sf::Color::Black);
+    _textField->setPosition(625, 30);
+    _textField->setOutlineColor(sf::Color::White);
+    _textField->setOutlineThickness(1);
+    _textField->setString("00:00");
+    _textField->setStyle(sf::Text::Bold);
+
+    _backgroud_to_textField1 = new sf::RectangleShape(sf::Vector2f(150, 50));
+    _backgroud_to_textField1->setFillColor(sf::Color::White);
+    _backgroud_to_textField1->setOutlineColor(sf::Color::Black);
+    _backgroud_to_textField1->setOutlineThickness(2);
+    _backgroud_to_textField1->setPosition(620, 25);
+}
 
 void GameWith2State::HandleInput() {
     sf::Event event;
@@ -41,7 +67,7 @@ void GameWith2State::HandleInput() {
                 else if(event.key.code == sf::Keyboard::Escape){
                     //powrot do menu
                     std::cout << "Escape" << std::endl;
-                    _data->stateManager.AddState(StateRef(new MenuState(_data)), false);
+                    _data->stateManager.AddState(StateRef(new MenuState(_data)), true);
                     return;
                 }
                 break;
@@ -68,6 +94,18 @@ void GameWith2State::HandleInput() {
                     stopDragging(mousePos);
                 }
                 break;
+
+           case sf::Event::TextEntered:
+               if (std::isdigit(event.text.unicode)) {
+                   // Add digit to input
+                   inputText += static_cast<char>(event.text.unicode);
+               } else if (event.text.unicode == 8 && !inputText.empty()) { // Backspace
+                   // Remove last character
+                   inputText.pop_back();
+               }
+                _textField->setString(inputText);
+               break;
+           
 
             default:    
                 break;
@@ -143,9 +181,9 @@ void GameWith2State::Draw() {
     sf::View view(sf::FloatRect(0, 0, 800, 600));
     _data->window.setView(view);
     _data->window.clear(sf::Color(40, 20, 2));
-
-    _board.drawBoard(_data->window, showCoordinates);
     
+    _board.drawBoard(_data->window, showCoordinates);
+
     if (isDragging && draggedPiece) {
         _board.showPossibleMoves(_data->window, draggedPiece);
         _board.showPossibleCaptures(_data->window, draggedPiece);
@@ -156,10 +194,19 @@ void GameWith2State::Draw() {
     }
     _board.showCheck(_data->window, currentPlayerTurn);
     _board.drawPieces(_data->window, draggedPiece);
-    
 
    // _data->window.draw(sidePanel);
     _data->window.draw(_startButton);
-
+     _data->window.draw(*_backgroud_to_textField1);
+    _data->window.draw(*_textField);
+   
     _data->window.display();
+}
+
+
+
+void GameWith2State::ClearObjects() {
+    _board.deleteObjects();
+    _data->assetManager.clearAssets();
+    delete _backgroud_to_textField1;
 }

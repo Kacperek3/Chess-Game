@@ -49,7 +49,6 @@ public:
 
 protected:
     Board* board; // wskaźnik na planszę
-    sf::Texture texture; // tekstura figury
     sf::Sprite sprite; // sprite figury
     sf::Vector2f m_position; // pozycja figury na planszy
     int m_color; // kolor figury

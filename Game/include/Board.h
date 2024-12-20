@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "Game.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -11,14 +11,13 @@
 #include "Bishop.h"
 #include "Knight.h"
 
-
 class Board {
 public:
 
     sf::RenderWindow *window;
-
-    Board(sf::RenderWindow* window);  
-
+    Board(GameDataRef data);
+    void Init();
+    ~Board();
 
     // funkcje odpowiedzialne za logikę gry
     void draw(sf::RenderWindow& window, bool showCoordinates);  
@@ -43,6 +42,8 @@ public:
     bool isStalemate(int color);
     Piece* getPieceAt(int x, int y);
     void rotatePieces();
+    void deleteObjects();
+
 
 private:
     
@@ -54,20 +55,13 @@ private:
     void undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece);
 
 
-
-
+    GameDataRef _data;
     // funkcje odpowiedzialne za rysowanie planszy i bierki itp
-    sf::Color lightColor; 
-    sf::Color darkColor; 
-    sf::Color recColor;
-    sf::Color circleColor;
-    sf::Font font;
-    sf::Text coordinates;
-
-    sf::RectangleShape tile;
-    sf::RectangleShape markedField;
-    
-    sf::CircleShape circle;
+    sf::RectangleShape *tile;
+    sf::RectangleShape *markedField;
+    sf::CircleShape *circle;
 
 
+    sf::Color *recColor;
+    sf::Color *circleColor;
 };

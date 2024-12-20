@@ -36,7 +36,7 @@ void MenuState::HandleInput() {
             
             if(_data->inputManager.IsSpriteClicked(_playWithFriendSprite, sf::Mouse::Left, _data->window)) {
                 std::cout << "Play with friend selected\n";
-                _data->stateManager.AddState(StateRef(new GameWith2State(_data)), false);
+                _data->stateManager.AddState(StateRef(new GameWith2State(_data)), true);
             }
             else if (_data->inputManager.IsSpriteClicked(_playWithAISprite, sf::Mouse::Left, _data->window)) {
                 std::cout << "Start selected\n";
@@ -68,4 +68,9 @@ void MenuState::Draw() {
     _data->window.draw(_playWithFriendSprite);
     _data->window.draw(_playWithAISprite);
     _data->window.display();
+}
+
+
+void MenuState::ClearObjects() {
+    _data->assetManager.clearAssets();
 }
