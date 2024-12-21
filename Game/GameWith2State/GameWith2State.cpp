@@ -8,7 +8,6 @@ GameWith2State::GameWith2State(GameDataRef data): _data(data), _board(data) {
 
 void GameWith2State::Init(){
     currentPlayerTurn = WHITE;
-    showCoordinates = false;
     isDragging = false;
     draggedPiece = nullptr;
     dragOffset = sf::Vector2f(0, 0);
@@ -22,12 +21,8 @@ void GameWith2State::Init(){
     _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
     _startButton.setPosition(600, 271);
 
-
-
     _data->assetManager.LoadFont("Poppins", "../assets/fonts/Poppins-Thin.ttf");
     _font = _data->assetManager.GetFont("Poppins");
-
-
 
 
     for(auto texture : _data->assetManager._textures){
@@ -44,11 +39,18 @@ void GameWith2State::Init(){
     _textField->setString("00:00");
     _textField->setStyle(sf::Text::Bold);
 
-    _backgroud_to_textField1 = new sf::RectangleShape(sf::Vector2f(150, 50));
-    _backgroud_to_textField1->setFillColor(sf::Color::White);
-    _backgroud_to_textField1->setOutlineColor(sf::Color::Black);
-    _backgroud_to_textField1->setOutlineThickness(2);
-    _backgroud_to_textField1->setPosition(620, 25);
+
+
+
+    _data->assetManager.LoadTexture("BACKGROUND_TO_TEXTFIELD", "../assets/TextClockBackground.png");
+    _backgroudn_to_textField1.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD"));
+    _backgroudn_to_textField1.setPosition(620, 25);
+
+    // _backgroud_to_textField1 = new sf::RectangleShape(sf::Vector2f(150, 50));
+    // _backgroud_to_textField1->setFillColor(sf::Color::White);
+    // _backgroud_to_textField1->setOutlineColor(sf::Color::Black);
+    // _backgroud_to_textField1->setOutlineThickness(2);
+    // _backgroud_to_textField1->setPosition(620, 25);
 }
 
 void GameWith2State::HandleInput() {
@@ -60,11 +62,7 @@ void GameWith2State::HandleInput() {
                 return;
                 break;
             case sf::Event::KeyPressed:
-                if (event.key.code == sf::Keyboard::R) {
-                    //wlaczenie i wylaczenie wspolrzednych
-                    toggleCoordinates();
-                }
-                else if(event.key.code == sf::Keyboard::Escape){
+                if(event.key.code == sf::Keyboard::Escape){
                     //powrot do menu
                     std::cout << "Escape" << std::endl;
                     _data->stateManager.AddState(StateRef(new MenuState(_data)), true);
@@ -76,6 +74,23 @@ void GameWith2State::HandleInput() {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     //rozpoczecie przesuwania pionka
                     sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
+
+
+                    if (_data->inputManager.IsSpriteHover(_startButton, sf::Mouse::Left, _data->window)) {
+                        // Pobierz czas z _textField i aktywuj odliczanie
+                        try {
+                            int minutes = std::stoi(inputText.substr(0, 2));
+                            int seconds = std::stoi(inputText.substr(3, 2));
+                            remainingTimeInSeconds = minutes * 60 + seconds;
+                            countdownClock.restart();
+                            isCountdownActive = true;
+                        } catch (...) {
+                            std::cout << "Nieprawidłowy format czasu" << std::endl;
+                        }
+                    }
+
+
+
                     startDragging(mousePos);
                 }
                 else if(event.mouseButton.button == sf::Mouse::Right and isDragging){
@@ -99,7 +114,12 @@ void GameWith2State::HandleInput() {
                if (std::isdigit(event.text.unicode)) {
                    // Add digit to input
                    inputText += static_cast<char>(event.text.unicode);
-               } else if (event.text.unicode == 8 && !inputText.empty()) { // Backspace
+               }
+               else if (event.text.unicode == 58) { // Colon
+                   // Add colon to input
+                   inputText += ":";
+                }
+                else if (event.text.unicode == 8 && !inputText.empty()) { // Backspace
                    // Remove last character
                    inputText.pop_back();
                }
@@ -156,9 +176,6 @@ void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
     dragOffset = sf::Vector2f(0, 0);
 }
 
-void GameWith2State::toggleCoordinates() {
-    showCoordinates = !showCoordinates;
-}
 
 void GameWith2State::Update() {
     // Usuwanie pionka, który doszedł do końca planszy
@@ -174,6 +191,29 @@ void GameWith2State::Update() {
         _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
     }
 
+
+
+    if (isCountdownActive) {
+        sf::Time elapsed = countdownClock.getElapsedTime();
+        if (elapsed.asSeconds() >= 1) {
+            remainingTimeInSeconds -= static_cast<int>(elapsed.asSeconds());
+            countdownClock.restart();
+
+            if (remainingTimeInSeconds <= 0) {
+                isCountdownActive = false;
+                remainingTimeInSeconds = 0;
+                std::cout << "Koniec odliczania!" << std::endl;
+            }
+
+            // Aktualizuj tekst wyświetlany w _textField
+            int minutes = remainingTimeInSeconds / 60;
+            int seconds = remainingTimeInSeconds % 60;
+            std::ostringstream timeStream;
+            timeStream << std::setw(2) << std::setfill('0') << minutes << ":"
+                    << std::setw(2) << std::setfill('0') << seconds;
+            _textField->setString(timeStream.str());
+        }
+    }
 }
 
 void GameWith2State::Draw() {
@@ -182,7 +222,7 @@ void GameWith2State::Draw() {
     _data->window.setView(view);
     _data->window.clear(sf::Color(40, 20, 2));
     
-    _board.drawBoard(_data->window, showCoordinates);
+    _board.drawBoard(_data->window, false);
 
     if (isDragging && draggedPiece) {
         _board.showPossibleMoves(_data->window, draggedPiece);
@@ -197,7 +237,8 @@ void GameWith2State::Draw() {
 
    // _data->window.draw(sidePanel);
     _data->window.draw(_startButton);
-     _data->window.draw(*_backgroud_to_textField1);
+    //_data->window.draw(*_backgroud_to_textField1);
+    _data->window.draw(_backgroudn_to_textField1);
     _data->window.draw(*_textField);
    
     _data->window.display();
@@ -208,5 +249,5 @@ void GameWith2State::Draw() {
 void GameWith2State::ClearObjects() {
     _board.deleteObjects();
     _data->assetManager.clearAssets();
-    delete _backgroud_to_textField1;
+    //delete _backgroud_to_textField1;
 }

@@ -21,7 +21,7 @@ private:
 
     void startDragging(const sf::Vector2f& mousePosition);
     void stopDragging(sf::Vector2f& mousePosition);
-    void toggleCoordinates();
+    //void toggleCoordinates();
     void rotateView();
     
 
@@ -33,7 +33,7 @@ private:
     sf::Vector2f dragOffset;
     bool isDragging = false;
     Piece* draggedPiece = nullptr;
-    bool showCoordinates = false;
+    //bool showCoordinates = false;
     bool isBoardRotated = false;
 
 
@@ -44,9 +44,13 @@ private:
     sf::Font _font;
     std::unique_ptr<sf::Text> _textField;
     std::string inputText = "";
-    sf::RectangleShape* _backgroud_to_textField1;  //obramowanie do wpisania czasu zegara (_textField)
+    //sf::RectangleShape* _backgroud_to_textField1;  //obramowanie do wpisania czasu zegara (_textField)
+    sf::Clock countdownClock;
+    int remainingTimeInSeconds = 0;
+    bool isCountdownActive = false;
+    sf::Sprite _backgroudn_to_textField1;
 
-    
+
     //sf::RectangleShape* _backgroud_to_textField;
 
 
