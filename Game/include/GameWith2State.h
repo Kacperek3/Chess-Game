@@ -40,16 +40,9 @@ private:
 
 
     //rysowanie pozotalych elementow 
-    sf::Sprite _startButton;
     
-    sf::Font _font;
-    std::unique_ptr<sf::Text> _textField;
-    std::string inputText = "";
-    //sf::RectangleShape* _backgroud_to_textField1;  //obramowanie do wpisania czasu zegara (_textField)
-    sf::Clock countdownClock;
-    int remainingTimeInSeconds = 0;
-    bool isCountdownActive = false;
-    sf::Sprite _backgroudn_to_textField1;
+   
+    
 
     ClockWidget *_clockWidget;
     //sf::RectangleShape* _backgroud_to_textField;

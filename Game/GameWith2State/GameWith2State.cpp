@@ -14,40 +14,6 @@ void GameWith2State::Init(){
 
     _board.Init();
 
-    //rysowanie pozostałych elementów
-
-    _data->assetManager.LoadTexture("START_BUTTON", "../assets/GameWithFriendState/Buttons/StartButton.png");
-    _data->assetManager.LoadTexture("START_BUTTON_HOVER", "../assets/GameWithFriendState/Buttons/StartButton_hover.png");
-    _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
-    _startButton.setPosition(610, 271);
-    _startButton.setScale(0.90, 0.90);
-
-    _data->assetManager.LoadFont("Poppins", "../assets/fonts/Poppins-Thin.ttf");
-    _font = _data->assetManager.GetFont("Poppins");
-
-    _textField = std::make_unique<sf::Text>();
-    _textField->setFont(_font);
-    _textField->setCharacterSize(24);
-    _textField->setFillColor(sf::Color::Black);
-    _textField->setPosition(625, 30);
-    _textField->setOutlineColor(sf::Color::White);
-    _textField->setOutlineThickness(1);
-    _textField->setString("00:00");
-    _textField->setStyle(sf::Text::Bold);
-
-
-
-
-    _data->assetManager.LoadTexture("BACKGROUND_TO_TEXTFIELD", "../assets/TextClockBackground.png");
-    _backgroudn_to_textField1.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD"));
-    _backgroudn_to_textField1.setPosition(620, 25);
-
-    // _backgroud_to_textField1 = new sf::RectangleShape(sf::Vector2f(150, 50));
-    // _backgroud_to_textField1->setFillColor(sf::Color::White);
-    // _backgroud_to_textField1->setOutlineColor(sf::Color::Black);
-    // _backgroud_to_textField1->setOutlineThickness(2);
-    // _backgroud_to_textField1->setPosition(620, 25);
-
     _clockWidget = new ClockWidget(_data);
     _clockWidget->Init();
 }
@@ -73,24 +39,10 @@ void GameWith2State::HandleInput() {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     //rozpoczecie przesuwania pionka
                     sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
-
-
-                    if (_data->inputManager.IsSpriteHover(_startButton, sf::Mouse::Left, _data->window)) {
-                        // Pobierz czas z _textField i aktywuj odliczanie
-                        try {
-                            int minutes = std::stoi(inputText.substr(0, 2));
-                            int seconds = std::stoi(inputText.substr(3, 2));
-                            remainingTimeInSeconds = minutes * 60 + seconds;
-                            countdownClock.restart();
-                            isCountdownActive = true;
-                        } catch (...) {
-                            std::cout << "Nieprawidłowy format czasu" << std::endl;
-                        }
-                    }
-
-
-
                     startDragging(mousePos);
+
+
+                    _clockWidget->isStartButtonPressed();
                 }
                 else if(event.mouseButton.button == sf::Mouse::Right and isDragging){
                     //przywracanie pionka na miejsce po kliknieciu prawym przyciskiem myszy
@@ -110,19 +62,7 @@ void GameWith2State::HandleInput() {
                 break;
 
            case sf::Event::TextEntered:
-               if (std::isdigit(event.text.unicode)) {
-                   // Add digit to input
-                   inputText += static_cast<char>(event.text.unicode);
-               }
-               else if (event.text.unicode == 58) { // Colon
-                   // Add colon to input
-                   inputText += ":";
-                }
-                else if (event.text.unicode == 8 && !inputText.empty()) { // Backspace
-                   // Remove last character
-                   inputText.pop_back();
-               }
-                _textField->setString(inputText);
+               _clockWidget->inputTime(event);
                break;
            
 
@@ -184,35 +124,8 @@ void GameWith2State::Update() {
         }
     }
 
-    if(_data->inputManager.IsSpriteHover(_startButton, sf::Mouse::Left, _data->window)){
-        _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON_HOVER"));
-    } else {
-        _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
-    }
+    _clockWidget->Update();
 
-
-
-    if (isCountdownActive) {
-        sf::Time elapsed = countdownClock.getElapsedTime();
-        if (elapsed.asSeconds() >= 1) {
-            remainingTimeInSeconds -= static_cast<int>(elapsed.asSeconds());
-            countdownClock.restart();
-
-            if (remainingTimeInSeconds <= 0) {
-                isCountdownActive = false;
-                remainingTimeInSeconds = 0;
-                std::cout << "Koniec odliczania!" << std::endl;
-            }
-
-            // Aktualizuj tekst wyświetlany w _textField
-            int minutes = remainingTimeInSeconds / 60;
-            int seconds = remainingTimeInSeconds % 60;
-            std::ostringstream timeStream;
-            timeStream << std::setw(2) << std::setfill('0') << minutes << ":"
-                    << std::setw(2) << std::setfill('0') << seconds;
-            _textField->setString(timeStream.str());
-        }
-    }
 }
 
 void GameWith2State::Draw() {
@@ -235,10 +148,6 @@ void GameWith2State::Draw() {
     _board.drawPieces(_data->window, draggedPiece);
 
    // _data->window.draw(sidePanel);
-    _data->window.draw(_startButton);
-    //_data->window.draw(*_backgroud_to_textField1);
-    _data->window.draw(_backgroudn_to_textField1);
-    _data->window.draw(*_textField);
    
     _clockWidget->Draw();
 
@@ -249,8 +158,8 @@ void GameWith2State::Draw() {
 
 void GameWith2State::ClearObjects() {
     _board.deleteObjects();
-    _data->assetManager.clearAssets();
     delete _clockWidget;
+    _data->assetManager.clearAssets();
     
     //delete _backgroud_to_textField1;
 }
