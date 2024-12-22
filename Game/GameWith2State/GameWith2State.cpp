@@ -47,6 +47,9 @@ void GameWith2State::Init(){
     // _backgroud_to_textField1->setOutlineColor(sf::Color::Black);
     // _backgroud_to_textField1->setOutlineThickness(2);
     // _backgroud_to_textField1->setPosition(620, 25);
+
+    _clockWidget = new ClockWidget(_data);
+    _clockWidget->Init();
 }
 
 void GameWith2State::HandleInput() {
@@ -237,6 +240,8 @@ void GameWith2State::Draw() {
     _data->window.draw(_backgroudn_to_textField1);
     _data->window.draw(*_textField);
    
+    _clockWidget->Draw();
+
     _data->window.display();
 }
 
@@ -245,5 +250,7 @@ void GameWith2State::Draw() {
 void GameWith2State::ClearObjects() {
     _board.deleteObjects();
     _data->assetManager.clearAssets();
+    delete _clockWidget;
+    
     //delete _backgroud_to_textField1;
 }

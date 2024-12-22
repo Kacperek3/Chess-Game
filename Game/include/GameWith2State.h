@@ -6,6 +6,7 @@
 #include "Game.h"
 #include <string>
 #include <memory>
+#include "Clock.h"
 
 class GameWith2State : public State {
 public:
@@ -50,7 +51,7 @@ private:
     bool isCountdownActive = false;
     sf::Sprite _backgroudn_to_textField1;
 
-
+    ClockWidget *_clockWidget;
     //sf::RectangleShape* _backgroud_to_textField;
 
 
