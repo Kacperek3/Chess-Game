@@ -34,19 +34,9 @@ private:
     sf::Vector2f dragOffset;
     bool isDragging = false;
     Piece* draggedPiece = nullptr;
-    //bool showCoordinates = false;
     bool isBoardRotated = false;
 
-
-
-    //rysowanie pozotalych elementow 
-    
-   
-    
-
     ClockWidget *_clockWidget;
-    //sf::RectangleShape* _backgroud_to_textField;
-
-
+    bool _isClockTimeSet = false;
 
 };

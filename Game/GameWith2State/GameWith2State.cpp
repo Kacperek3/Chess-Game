@@ -42,7 +42,8 @@ void GameWith2State::HandleInput() {
                     startDragging(mousePos);
 
 
-                    _clockWidget->isStartButtonPressed();
+                    _clockWidget->StartButtonPressed();
+                    _isClockTimeSet = _clockWidget->getIsClockTimeSet();
                 }
                 else if(event.mouseButton.button == sf::Mouse::Right and isDragging){
                     //przywracanie pionka na miejsce po kliknieciu prawym przyciskiem myszy
@@ -90,7 +91,7 @@ void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
     float snappedY = int(mousePosition.y / 75);
     
     if (draggedPiece->isValidMove(snappedX, snappedY) && 
-        !_board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY))) {
+        !_board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY)) && _isClockTimeSet) {
         if (_board.isEnemyPieceAt(snappedX, snappedY, draggedPiece->getColor())) {
             std::cout << "Zbito" << std::endl;
             _board.removePiece(snappedX, snappedY);
@@ -99,6 +100,8 @@ void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
         draggedPiece->move(snappedX, snappedY);
         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
         _board.rotatePieces();
+        _clockWidget->togglePlayerTime();
+        _clockWidget->rotatePositionClocks();
 
         if (_board.isCheckmate(currentPlayerTurn)) {
             std::cout << "Szach" << std::endl;
@@ -125,29 +128,27 @@ void GameWith2State::Update() {
     }
 
     _clockWidget->Update();
-
 }
 
 void GameWith2State::Draw() {
 
     sf::View view(sf::FloatRect(0, 0, 800, 600));
     _data->window.setView(view);
-    _data->window.clear(sf::Color(40, 20, 2));
+    _data->window.clear(sf::Color( 58, 58, 58 ));
     
     _board.drawBoard(_data->window, false);
 
     if (isDragging && draggedPiece) {
-        _board.showPossibleMoves(_data->window, draggedPiece);
-        _board.showPossibleCaptures(_data->window, draggedPiece);
-        _board.markPieceField(_data->window, draggedPiece);
-
+        if(_isClockTimeSet){
+            _board.showPossibleMoves(_data->window, draggedPiece);
+            _board.showPossibleCaptures(_data->window, draggedPiece);
+            _board.markPieceField(_data->window, draggedPiece);
+        }
         sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
         draggedPiece->move(mousePos - dragOffset);
     }
     _board.showCheck(_data->window, currentPlayerTurn);
     _board.drawPieces(_data->window, draggedPiece);
-
-   // _data->window.draw(sidePanel);
    
     _clockWidget->Draw();
 

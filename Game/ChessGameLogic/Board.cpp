@@ -450,7 +450,8 @@ void Board::showCheck(sf::RenderWindow& window, int color){
 }
 
 void Board::markPieceField(sf::RenderWindow& window, Piece* piece){
-    markedField->setFillColor(*recColor);
+    sf::Color markedColor(223, 223, 103, 128);
+    markedField->setFillColor(markedColor);
     markedField->setPosition(piece->getBoardPosition().x * 75, piece->getBoardPosition().y * 75);
     window.draw(*markedField);
 }
@@ -467,8 +468,8 @@ void Board::drawPieces(sf::RenderWindow& window, Piece* draggedPiece) {
 }
 
 void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
-    sf::Color *lightColor = new sf::Color(255, 206, 158);
-    sf::Color *darkColor = new sf::Color(209, 139, 71);
+    sf::Color *lightColor = new sf::Color(238, 238, 210);
+    sf::Color *darkColor = new sf::Color(118, 150, 86);
 
 
     for (int row = 0; row < 8; ++row) {
