@@ -23,5 +23,5 @@ private:
     std::vector<sf::Sprite> _capturedBlackPieces;
 
 
-    sf::RectangleShape *_background1;
+    //sf::RectangleShape *_background1;
 };

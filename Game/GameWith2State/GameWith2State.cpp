@@ -16,8 +16,10 @@ void GameWith2State::Init(){
 
     _clockWidget = new ClockWidget(_data);
     _capturedPieces = new CapturedPieces(_data);
+    _decorations = new Decorations(_data);
     _clockWidget->Init();
     _capturedPieces->Init();
+    _decorations->Init();
 }
 
 void GameWith2State::HandleInput() {
@@ -77,10 +79,16 @@ void GameWith2State::HandleInput() {
 
 void GameWith2State::startDragging(const sf::Vector2f& mousePosition) {
     for (auto& piece : _board.b_pieces) {
-        if (_data->inputManager.IsSpriteHoverAccurate(piece->getSprite(), sf::Mouse::Left, _data->window) && piece->getColor() == currentPlayerTurn) {
+        if (_data->inputManager.IsSpriteHover(piece->getSprite(), sf::Mouse::Left, _data->window) && piece->getColor() == currentPlayerTurn) {
             isDragging = true;
             draggedPiece = dynamic_cast<Piece*>(piece);
-            dragOffset = mousePosition - draggedPiece->getPosition();
+            //dragOffset = mousePosition - draggedPiece->getPosition();
+            sf::Vector2f temp;
+            temp.x = mousePosition.x - draggedPiece->getSprite().getGlobalBounds().width / 2;
+            temp.y = mousePosition.y - draggedPiece->getSprite().getGlobalBounds().height / 2;
+            draggedPiece->move(temp);
+
+            draggedPiece->move(mousePosition);
             break;
         }
     }
@@ -104,6 +112,7 @@ void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
         _board.rotatePieces();
         _clockWidget->togglePlayerTime();
         _clockWidget->rotatePositionClocks();
+        _decorations->rotatePositionDecorations();
 
         if (_board.isCheckmate(currentPlayerTurn)) {
             std::cout << "Szach" << std::endl;
@@ -146,13 +155,18 @@ void GameWith2State::Draw() {
             _board.markPieceField(_data->window, draggedPiece);
         }
         sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
-        draggedPiece->move(mousePos - dragOffset);
+
+        sf::Vector2f temp;
+        temp.x = mousePos.x - draggedPiece->getSprite().getGlobalBounds().width / 2;
+        temp.y = mousePos.y - draggedPiece->getSprite().getGlobalBounds().height / 2;
+        draggedPiece->move(temp);
     }
     _board.showCheck(_data->window, currentPlayerTurn);
     _board.drawPieces(_data->window, draggedPiece);
     _capturedPieces->Draw();
    
     _clockWidget->Draw();
+    _decorations->Draw();
 
     _data->window.display();
 }

@@ -5,15 +5,16 @@ CapturedPieces::CapturedPieces(GameDataRef data): _data(data) {
 }
 
 void CapturedPieces::Init() {
-    _background1 = new sf::RectangleShape(sf::Vector2f(200, 340));
-    _background1->setFillColor(sf::Color( 148, 148,148, 128));
-    _background1->setPosition(600, 130);
+    //_background1 = new sf::RectangleShape(sf::Vector2f(200, 700));
+    // _background1->setFillColor(sf::Color( 148, 148,148, 128));
+    // _background1->setPosition(600, 0);
 
 }
 
 void CapturedPieces::AddCapturedPiece(std::string pieceName, int color) {
     sf::Sprite sprite(_data->assetManager.GetTexture(pieceName));
-    sprite.setScale(0.65, 0.65);
+    sprite.setScale(0.35, 0.35);
+
     if (color == WHITE) {
         _capturedWhitePieces.push_back(sprite);
     } else {
@@ -23,34 +24,60 @@ void CapturedPieces::AddCapturedPiece(std::string pieceName, int color) {
 
 
 void CapturedPieces::Draw() {
-    _data->window.draw(*_background1);
+    std::vector<std::pair<std::string, sf::Sprite>> orderedPieces;
 
-    int x = 0, y = 0;
-    for (auto& piece : _capturedWhitePieces) {
-        piece.setPosition(50 + x * 10, 2 + y * 50);
-        _data->window.draw(piece);
-        x++;
-        if (x == 4) {
-            x = 0;
-            y++;
+    auto addPiecesByType = [&](const std::string& pieceType) {
+        for (auto& piece : _capturedWhitePieces) {
+            if (piece.getTexture() == &_data->assetManager.GetTexture(pieceType)) {
+                orderedPieces.emplace_back(pieceType, piece);
+            }
         }
-    }
+        for(auto& piece : _capturedBlackPieces) {
+            if (piece.getTexture() == &_data->assetManager.GetTexture(pieceType)) {
+                orderedPieces.emplace_back(pieceType, piece);
+            }
+        }
+    };
 
-    x = 0;
-    y = 0;
-    for (auto& piece : _capturedBlackPieces) {
-        piece.setPosition(50 + x * 10, 654 + y * 50);
-        _data->window.draw(piece);
-        x++;
-        if (x == 4) {
-            x = 0;
-            y++;
+    addPiecesByType("wp"); 
+    addPiecesByType("wn"); 
+    addPiecesByType("wb"); 
+    addPiecesByType("wr"); 
+    addPiecesByType("wq"); 
+
+    addPiecesByType("bp");
+    addPiecesByType("bn");
+    addPiecesByType("bb");
+    addPiecesByType("br");
+    addPiecesByType("bq");
+
+    int x = 40; 
+    int y = 23;
+    std::string previousType;
+    bool firstBlack = false;
+
+    for (auto& [pieceType, piece] : orderedPieces) {
+        if(pieceType[0] == 'b' and !firstBlack) {
+            x = 40;
+            y = 673;
+            firstBlack = true;
         }
+
+        if (previousType.empty() || pieceType != previousType) {
+            // Jeśli zmiana typu figury, dodaj odstęp 20px
+            x += 20;
+        } else {
+            // Jeśli ten sam typ figury, dodaj odstęp 10px
+            x += 10;
+        }
+        piece.setPosition(x, y);
+        _data->window.draw(piece);
+        previousType = pieceType;
     }
 }
 
 
 CapturedPieces::~CapturedPieces() {
     std::cout << "CapturedPieces destructor" << std::endl;
-    delete _background1;
+    //delete _background1;
 }

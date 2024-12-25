@@ -8,6 +8,7 @@
 #include <memory>
 #include "Clock.h"
 #include "CapturedPieces.h"
+#include "Decorations.h"
 
 class GameWith2State : public State {
 public:
@@ -42,5 +43,6 @@ private:
 
 
     CapturedPieces *_capturedPieces;
+    Decorations *_decorations;
 
 };
