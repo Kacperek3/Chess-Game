@@ -39,6 +39,16 @@ void Decorations::Init() {
 
     _profilePictureBlack.setTexture(_data->assetManager.GetTexture("YETI"));
     _profilePictureBlack.setPosition(15, 3);
+
+    _backround = new sf::RectangleShape(sf::Vector2f(150, 670));
+    _backround->setFillColor(sf::Color(45, 45, 45));
+    _backround->setPosition(635, 15);
+
+
+
+    _data->assetManager.LoadTexture("SETTINGS", "../assets/settings.png");
+    _settings.setTexture(_data->assetManager.GetTexture("SETTINGS"));
+    _settings.setPosition(608, 12);
 }
 
 void Decorations::rotatePositionDecorations(){
@@ -56,8 +66,6 @@ void Decorations::rotatePositionDecorations(){
     whoOnTop = !whoOnTop;
 }
 
-
-
 void Decorations::Draw() { 
     _data->window.draw(_profilePictureBlack);
     _data->window.draw(*_textFieldNameBlack);
@@ -65,8 +73,11 @@ void Decorations::Draw() {
     _data->window.draw(_profilePictureWhite);
     _data->window.draw(*_textFieldNameWhite);
 
+    _data->window.draw(*_backround);
+    _data->window.draw(_settings);
 }
 
 Decorations::~Decorations() {
+    delete _backround;
     delete _textFieldNameBlack;
 }

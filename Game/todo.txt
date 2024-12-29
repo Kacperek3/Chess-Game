@@ -4,7 +4,7 @@ kolejnosc tworzenia rzeczy
 
 -naprawic dodawanie hetmana skoczka gonca lub wiezy gdy pionek dotrze do konca !!! wykonane
 
--dodac dzwieki
+-dodac dzwieki !!! wykonane
 
 -bicie w przelocie
 

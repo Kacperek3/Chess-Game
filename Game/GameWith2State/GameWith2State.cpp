@@ -295,10 +295,9 @@ void GameWith2State::Draw() {
     _board.showCheck(_data->window, currentPlayerTurn);
     _board.drawPieces(_data->window, draggedPiece);
     _capturedPieces->Draw();
-   
-    _clockWidget->Draw();
     _decorations->Draw();
-
+    _clockWidget->Draw();
+    
     if(_board._dataAboutPawnPromotion._isPawnPromotion){
         _pawnPromotion->ChangePosition(_board._dataAboutPawnPromotion._pawnX, 50, _board._dataAboutPawnPromotion._pawnColor);
         _pawnPromotion->Draw();
@@ -312,9 +311,9 @@ void GameWith2State::Draw() {
 
 void GameWith2State::ClearObjects() {
     _board.deleteObjects();
+    delete _decorations;
     delete _clockWidget;
     delete _capturedPieces;
-    delete _decorations;
     delete _pawnPromotion;
     delete _gameSounds;
     _data->soundManager.ClearSounds();

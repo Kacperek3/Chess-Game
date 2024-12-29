@@ -23,6 +23,10 @@ private:
     sf::Text *_textFieldNameBlack;
     sf::Text *_textFieldNameWhite;
 
+    sf::RectangleShape* _backround;
+
     sf::Sprite _profilePictureWhite;
     sf::Sprite _profilePictureBlack;
+
+    sf::Sprite _settings;
 };

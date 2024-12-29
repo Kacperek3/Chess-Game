@@ -16,8 +16,7 @@ void ClockWidget::Init() {
     _data->assetManager.LoadTexture("START_BUTTON", "../assets/GameWithFriendState/Buttons/StartButton.png");
     _data->assetManager.LoadTexture("START_BUTTON_HOVER", "../assets/GameWithFriendState/Buttons/StartButton_hover.png");
     _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON"));
-    _startButton.setPosition(610, 271);
-    _startButton.setScale(0.90, 0.90);
+    _startButton.setPosition(648, 330);
 
     _data->assetManager.LoadTexture("CLOCK_ICON_WHITE_1", "../assets/ClockWhiteICON1.png");
     _data->assetManager.LoadTexture("CLOCK_ICON_WHITE_2", "../assets/ClockWhiteICON2.png");
