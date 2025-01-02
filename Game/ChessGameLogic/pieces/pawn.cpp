@@ -7,7 +7,7 @@ Pawn::Pawn() {
 }
 
 Pawn::Pawn(int color, int boardX, int boardY, Board* board, int direction, sf::Texture& pawnTexture)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Pawn, boardX, boardY) 
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Pawn, boardX, boardY, 1) 
 {
     this->direction = direction;   
     this->board = board;

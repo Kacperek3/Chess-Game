@@ -216,6 +216,20 @@ std::vector<Coordinate> Board::getValidCaptures(Piece* piece) {
     return validCaptures;
 }
 
+std::vector<std::pair<Piece*, Coordinate>> Board::getAllMoves(int color) {
+    std::vector<std::pair<Piece*, Coordinate>> allMoves;
+    for (Piece* piece : playerPieces(color)) {
+        auto moves = getValidMoves(piece);
+        for (const auto& move : moves) {
+            allMoves.push_back({piece, move});
+        }
+    }
+    return allMoves;
+}
+
+
+
+
 void Board::undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece) {
     // przywrocenie oryginalnej pozycji
     piece->simulateMove(originalPosition.x, originalPosition.y);

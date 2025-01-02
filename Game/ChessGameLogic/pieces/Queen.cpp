@@ -6,7 +6,7 @@ Queen::Queen() {
 }
 
 Queen::Queen(int color, int boardX, int boardY, Board* board, sf::Texture& queenTexture)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Queen, boardX, boardY) 
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Queen, boardX, boardY, 9) 
 {
     this->board = board;
     sprite.setTexture(queenTexture);

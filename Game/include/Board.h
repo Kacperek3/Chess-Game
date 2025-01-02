@@ -40,6 +40,7 @@ public:
     void showPossibleCaptures(sf::RenderWindow& window, Piece* piece); 
     void showCheck(sf::RenderWindow& window, int color);
     void markPieceField(sf::RenderWindow& window, Piece* piece);
+    std::vector<std::pair<Piece*, Coordinate>> getAllMoves(int color);
     bool isStalemate(int color);
     Piece* getPieceAt(int x, int y);
     void rotatePieces();
@@ -50,12 +51,6 @@ public:
     void addBishop(int color, int boardX, int boardY);
     void addKnight(int color, int boardX, int boardY);
 
-
-
-    DataAboutPawnPromotion _dataAboutPawnPromotion;
-
-private:
-    
     Piece* findKing(int color);
     std::vector<Piece*> playerPieces(int color) const;
     std::vector<Piece*> enemyPieces(int color) const;
@@ -63,7 +58,9 @@ private:
     std::vector<Coordinate> getValidCaptures(Piece* piece);
     void undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece);
 
+    DataAboutPawnPromotion _dataAboutPawnPromotion;
 
+private:
     GameDataRef _data;
     // funkcje odpowiedzialne za rysowanie planszy i bierki itp
     sf::RectangleShape *tile;

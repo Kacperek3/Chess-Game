@@ -2,8 +2,8 @@
 #include "Pieces.h"
 
 
-Piece::Piece(int color, sf::Vector2f position, PieceType type, int boardX, int boardY)
-    : m_color(color), m_position(position), m_type(type) 
+Piece::Piece(int color, sf::Vector2f position, PieceType type, int boardX, int boardY, int value)
+    : m_color(color), m_position(position), m_type(type), _value(value) 
 {
     boardPosition = Coordinate(boardX, boardY);
 }
@@ -28,7 +28,6 @@ void Piece::simulateMove(int boardX, int boardY) {
     m_position = Position(boardX, boardY).getPixelPosition();
     boardPosition = Coordinate(boardX, boardY);
     sprite.setPosition(m_position);
-
 }
 
 void Piece::rotatePiece() {

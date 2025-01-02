@@ -6,7 +6,7 @@ Rook::Rook() {
 }
 
 Rook::Rook(int color, int boardX, int boardY, Board* board, sf::Texture& rookTexture)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Rook, boardX, boardY) 
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Rook, boardX, boardY, 5) 
 {
     this->board = board;
     sprite.setTexture(rookTexture);

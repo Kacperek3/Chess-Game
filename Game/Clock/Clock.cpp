@@ -199,7 +199,7 @@ void ClockWidget::inputTimeWhite(sf::Event event) {
     _textFieldWhite->setString(inputTextWhite);
 }
 
-void ClockWidget::Update(){
+bool ClockWidget::Update(){
     if(_data->inputManager.IsSpriteHover(_startButton, sf::Mouse::Left, _data->window)){
         _startButton.setTexture(_data->assetManager.GetTexture("START_BUTTON_HOVER"));
     } 
@@ -231,7 +231,7 @@ void ClockWidget::Update(){
             if (remainingTimeInSecondsBlack <= 0) {
                 isCountdownActiveBlack = false;
                 remainingTimeInSecondsBlack = 0;
-                std::cout << "Koniec odliczania dla czarnego!" << std::endl;
+                return BLACK_LOST;
             }
 
             // Aktualizuj tekst wyświetlany w _textFieldBlack
@@ -265,7 +265,7 @@ void ClockWidget::Update(){
             if (remainingTimeInSecondsWhite <= 0) {
                 isCountdownActiveWhite = false;
                 remainingTimeInSecondsWhite = 0;
-                std::cout << "Koniec odliczania dla białego!" << std::endl;
+                return WHITE_LOST;
             }
 
             // Aktualizuj tekst wyświetlany w _textFieldWhite
@@ -277,6 +277,7 @@ void ClockWidget::Update(){
             _textFieldWhite->setString(timeStream.str());
         }
     }
+    return 0;
 }
 
 void ClockWidget::togglePlayerTime() {
@@ -290,14 +291,9 @@ void ClockWidget::togglePlayerTime() {
         _textFieldBlack->setFillColor(sf::Color(200,200,200));
         _isClockWhiteIconVisible = false;
 
-
-        if (remainingTimeInSecondsWhite <= 40) {
-            _backgroudn_to_textFieldWhite.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_LOW_TIME"));
-        } else {
-            _backgroudn_to_textFieldWhite.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_POINTED"));
-            _textFieldWhite->setFillColor(sf::Color(0,0,0));
-            _isClockBlackIconVisible = true;
-        }
+        _backgroudn_to_textFieldWhite.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_POINTED"));
+        _textFieldWhite->setFillColor(sf::Color(0,0,0));
+        _isClockBlackIconVisible = true;
 
         _whichClockPointed = WHITE;
     } 
@@ -310,14 +306,11 @@ void ClockWidget::togglePlayerTime() {
         _backgroudn_to_textFieldWhite.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD"));
         _textFieldWhite->setFillColor(sf::Color( 80, 80, 80));
         _isClockBlackIconVisible = false;
+        
 
-        if (remainingTimeInSecondsBlack <= 40) {
-            _backgroudn_to_textFieldBlack.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_LOW_TIME"));
-        } else {
-            _backgroudn_to_textFieldBlack.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_BLACK_POINTED"));
-            _textFieldBlack->setFillColor(sf::Color(255,255,255));
-            _isClockWhiteIconVisible = true;
-        }
+        _backgroudn_to_textFieldBlack.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_BLACK_POINTED"));
+        _textFieldBlack->setFillColor(sf::Color(255,255,255));
+        _isClockWhiteIconVisible = true;
 
         _whichClockPointed = BLACK;
     }

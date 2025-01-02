@@ -26,7 +26,7 @@ public:
         Pawn, Rook, Knight, Bishop, Queen, King
     };
 
-    Piece(int color, sf::Vector2f position, PieceType type, int boardX, int boardY);
+    Piece(int color, sf::Vector2f position, PieceType type, int boardX, int boardY, int value);
     Piece();
     virtual ~Piece();
 
@@ -39,7 +39,7 @@ public:
     virtual std::vector<Coordinate> getPossibleCaptures() = 0;
     virtual void rotatePiece();
 
-
+    int getValue() { return _value; }
     sf::Sprite& getSprite();
     sf::Vector2f getPosition();
     Coordinate getBoardPosition();
@@ -72,6 +72,7 @@ public:
     }
 
 protected:
+    int _value;
     Board* board; // wskaźnik na planszę
     sf::Sprite sprite; // sprite figury
     sf::Vector2f m_position; // pozycja figury na planszy

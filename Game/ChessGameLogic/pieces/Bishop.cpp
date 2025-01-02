@@ -6,7 +6,7 @@ Bishop::Bishop() {
 }
 
 Bishop::Bishop(int color, int boardX, int boardY, Board* board, sf::Texture& bishopTexture)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Bishop, boardX, boardY) 
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Bishop, boardX, boardY, 3) 
 {
     this->board = board;
     sprite.setTexture(bishopTexture);

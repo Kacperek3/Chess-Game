@@ -1,5 +1,6 @@
 #include "MenuState.h"
 #include "GameWith2State.h"
+#include "GameWithAiState.h"
 
 MenuState::MenuState(GameDataRef data) : _data(data) {
     
@@ -40,7 +41,8 @@ void MenuState::HandleInput() {
                 _data->window.setSize(sf::Vector2u(800, 700)); 
             }
             else if (_data->inputManager.IsSpriteClicked(_playWithAISprite, sf::Mouse::Left, _data->window)) {
-                std::cout << "Start selected\n";
+                _data->stateManager.AddState(StateRef(new GameWithAiState(_data)), true);
+                _data->window.setSize(sf::Vector2u(800, 700));
             }
             
         }

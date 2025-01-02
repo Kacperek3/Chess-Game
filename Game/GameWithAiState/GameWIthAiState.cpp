@@ -1,26 +1,26 @@
-#include "GameWith2State.h"
+#include "GameWithAiState.h"
 #include "MenuState.h"
 
-GameWith2State::GameWith2State(GameDataRef data): _data(data), _board(data) {
+GameWithAiState::GameWithAiState(GameDataRef data): _data(data){
 }
 
 
 
-void GameWith2State::Init(){
+void GameWithAiState::Init(){
     currentPlayerTurn = WHITE;
     isDragging = false;
     draggedPiece = nullptr;
     dragOffset = sf::Vector2f(0, 0);
 
-    _board.Init();
+    
+    _aiLogic = new AiLogic(_data);
 
-    _clockWidget = new ClockWidget(_data);
+
     _capturedPieces = new CapturedPieces(_data);
     _decorations = new Decorations(_data);
     _pawnPromotion = new PawnPromotion(_data);
     _gameSounds = new GameSounds(_data);
     _gameOver = new GameOver(_data);
-    _clockWidget->Init();
     _capturedPieces->Init();
     _decorations->Init();
     _pawnPromotion->Init();
@@ -28,7 +28,7 @@ void GameWith2State::Init(){
     _gameOver->Init();
 }
 
-void GameWith2State::HandleInput() {
+void GameWithAiState::HandleInput() {
     sf::Event event;
     while (_data->window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -55,7 +55,7 @@ void GameWith2State::HandleInput() {
                 if(_isGameOver){
                     bool userChoice = _gameOver->UserInput();
                     if(userChoice == newGame){
-                        _data->stateManager.AddState(StateRef(new GameWith2State(_data)), true);
+                        _data->stateManager.AddState(StateRef(new GameWithAiState(_data)), true);
                     }
                     else if(userChoice == goToMainMenu){
                         _data->stateManager.AddState(StateRef(new MenuState(_data)), true);
@@ -63,32 +63,27 @@ void GameWith2State::HandleInput() {
                     
                 }
 
-                if(_board._dataAboutPawnPromotion._isPawnPromotion){
+                if(_aiLogic->_board->_dataAboutPawnPromotion._isPawnPromotion){
                     int choice = _pawnPromotion->ChoicePiece();
                     if(choice != 0){
                         if(choice == 1){
-                            _board.addQueen(_board._dataAboutPawnPromotion._pawnColor, _board._dataAboutPawnPromotion._pawnX, _board._dataAboutPawnPromotion._pawnY);
+                            _aiLogic->_board->addQueen(_aiLogic->_board->_dataAboutPawnPromotion._pawnColor, _aiLogic->_board->_dataAboutPawnPromotion._pawnX, _aiLogic->_board->_dataAboutPawnPromotion._pawnY);
                         }
                         else if(choice == 2){
-                            _board.addRook(_board._dataAboutPawnPromotion._pawnColor, _board._dataAboutPawnPromotion._pawnX, _board._dataAboutPawnPromotion._pawnY);
+                            _aiLogic->_board->addRook(_aiLogic->_board->_dataAboutPawnPromotion._pawnColor, _aiLogic->_board->_dataAboutPawnPromotion._pawnX, _aiLogic->_board->_dataAboutPawnPromotion._pawnY);
                         }
                         else if (choice == 3){
-                            _board.addBishop(_board._dataAboutPawnPromotion._pawnColor, _board._dataAboutPawnPromotion._pawnX, _board._dataAboutPawnPromotion._pawnY);
+                            _aiLogic->_board->addBishop(_aiLogic->_board->_dataAboutPawnPromotion._pawnColor, _aiLogic->_board->_dataAboutPawnPromotion._pawnX, _aiLogic->_board->_dataAboutPawnPromotion._pawnY);
                         }
                         else if (choice == 4) {
-                            _board.addKnight(_board._dataAboutPawnPromotion._pawnColor, _board._dataAboutPawnPromotion._pawnX, _board._dataAboutPawnPromotion._pawnY);
+                            _aiLogic->_board->addKnight(_aiLogic->_board->_dataAboutPawnPromotion._pawnColor, _aiLogic->_board->_dataAboutPawnPromotion._pawnX, _aiLogic->_board->_dataAboutPawnPromotion._pawnY);
                         }
-                        _board._dataAboutPawnPromotion._isPawnPromotion = false;
-                        _board._dataAboutPawnPromotion._pawnColor = 2;
-                        _board._dataAboutPawnPromotion._pawnX = -1;
-                        _board._dataAboutPawnPromotion._pawnY = -1;
+                        _aiLogic->_board->_dataAboutPawnPromotion._isPawnPromotion = false;
+                        _aiLogic->_board->_dataAboutPawnPromotion._pawnColor = 2;
+                        _aiLogic->_board->_dataAboutPawnPromotion._pawnX = -1;
+                        _aiLogic->_board->_dataAboutPawnPromotion._pawnY = -1;
 
                         currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
-                        _board.rotatePieces();
-                        _clockWidget->togglePlayerTime();
-                        _clockWidget->rotatePositionClocks();
-                        _capturedPieces->RotateCapturedPieces();
-                        _decorations->rotatePositionDecorations();   
                     }
                 }
 
@@ -97,9 +92,7 @@ void GameWith2State::HandleInput() {
                     clickedOnField(mousePos);
                 } // Jeśli nie kliknięto na poprawne pole, to clickedOnField zlikwiduje zaznaczenie na pionku
 
-                _clockWidget->StartButtonPressed();
-                _isClockTimeSet = _clockWidget->getIsClockTimeSet();
-                if(_isClockTimeSet && !_isGameStartSoundPlayed){
+                if(!_isGameStartSoundPlayed){
                     _gameSounds->PlayStartGameSound();
                     _isGameStartSoundPlayed = true;
                 }
@@ -124,16 +117,12 @@ void GameWith2State::HandleInput() {
                 stopDragging(mousePos);
             }
         }
-
-        if (event.type == sf::Event::TextEntered) {
-            _clockWidget->inputTime(event);
-        }
     }
 }
 
 
-bool GameWith2State::clickedOnPiece(const sf::Vector2f& mousePosition) {
-    for (auto& piece : _board.b_pieces) {
+bool GameWithAiState::clickedOnPiece(const sf::Vector2f& mousePosition) {
+    for (auto& piece : _aiLogic->_board->b_pieces) {
         if (_data->inputManager.IsSpriteClicked(piece->getSprite(), sf::Mouse::Left, _data->window) && piece->getColor() == currentPlayerTurn) {
             if (selectedPiece == nullptr) {
                 selectedPiece = dynamic_cast<Piece*>(piece);
@@ -151,36 +140,31 @@ bool GameWith2State::clickedOnPiece(const sf::Vector2f& mousePosition) {
     }
     return false;
 }
-void GameWith2State::clickedOnField(const sf::Vector2f& mousePosition) {
+void GameWithAiState::clickedOnField(const sf::Vector2f& mousePosition) {
     if (selectedPiece != nullptr) {
         int snappedX = int(mousePosition.x / 75);
         int snappedY = int((mousePosition.y - 50) / 75);
         bool iscapture = false;
-        if (selectedPiece->isValidMove(snappedX, snappedY) && !_board.isKingInCheckAfterMove(selectedPiece, Coordinate(snappedX, snappedY))) {
-            if (_board.isEnemyPieceAt(snappedX, snappedY, selectedPiece->getColor())) {
-                _board.removePiece(snappedX, snappedY, _capturedPieces);
+        if (selectedPiece->isValidMove(snappedX, snappedY) && !_aiLogic->_board->isKingInCheckAfterMove(selectedPiece, Coordinate(snappedX, snappedY))) {
+            if (_aiLogic->_board->isEnemyPieceAt(snappedX, snappedY, selectedPiece->getColor())) {
+                _aiLogic->_board->removePiece(snappedX, snappedY, _capturedPieces);
                 iscapture = true;
             }
 
             selectedPiece->move(snappedX, snappedY);
-            if(!_board._dataAboutPawnPromotion._isPawnPromotion){
+            if(!_aiLogic->_board->_dataAboutPawnPromotion._isPawnPromotion){
                 currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
-                _board.rotatePieces();
-                _clockWidget->togglePlayerTime();
-                _clockWidget->rotatePositionClocks();
-                _capturedPieces->RotateCapturedPieces();
-                _decorations->rotatePositionDecorations();   
             }
-            if (_board.isCheckmate(currentPlayerTurn)) {
+            if (_aiLogic->_board->isCheckmate(currentPlayerTurn)) {
                 _gameSounds->PlayEndGameSound();
                 _isGameOver = true;
                 _isMovingAllowed = false;
                 _gameOver->whoWins(currentPlayerTurn, checkmate);
             }
-            else if (_board.isStalemate(currentPlayerTurn)) {
+            else if (_aiLogic->_board->isStalemate(currentPlayerTurn)) {
                 
             }
-            else if(_board.isKingInCheck(currentPlayerTurn)){
+            else if(_aiLogic->_board->isKingInCheck(currentPlayerTurn)){
                 _gameSounds->PlayCheckSound();
             }
             else if(!iscapture){
@@ -198,8 +182,8 @@ void GameWith2State::clickedOnField(const sf::Vector2f& mousePosition) {
     }
 }
 
-void GameWith2State::startDragging(const sf::Vector2f& mousePosition) {
-    for (auto& piece : _board.b_pieces) {
+void GameWithAiState::startDragging(const sf::Vector2f& mousePosition) {
+    for (auto& piece : _aiLogic->_board->b_pieces) {
         if (_data->inputManager.IsSpriteHover(piece->getSprite(), sf::Mouse::Left, _data->window) && piece->getColor() == currentPlayerTurn) {
             isDragging = true;
             draggedPiece = dynamic_cast<Piece*>(piece);
@@ -215,7 +199,7 @@ void GameWith2State::startDragging(const sf::Vector2f& mousePosition) {
     }
 }
 
-void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
+void GameWithAiState::stopDragging(sf::Vector2f& mousePosition) {
     isDragging = false;
 
     int snappedX = int(mousePosition.x / 75);
@@ -224,36 +208,30 @@ void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
     bool isCapture = false; // Flaga do śledzenia, czy pionek został zbity
 
     if (draggedPiece->isValidMove(snappedX, snappedY) && 
-        !_board.isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY)) 
-        && _isClockTimeSet
-        && !_board._dataAboutPawnPromotion._isPawnPromotion) {
+        !_aiLogic->_board->isKingInCheckAfterMove(draggedPiece, Coordinate(snappedX, snappedY)) 
+        && !_aiLogic->_board->_dataAboutPawnPromotion._isPawnPromotion) {
 
-        if (_board.isEnemyPieceAt(snappedX, snappedY, draggedPiece->getColor())) {
+        if (_aiLogic->_board->isEnemyPieceAt(snappedX, snappedY, draggedPiece->getColor())) {
             std::cout << "Zbito" << std::endl;
-            _board.removePiece(snappedX, snappedY, _capturedPieces);
+            _aiLogic->_board->removePiece(snappedX, snappedY, _capturedPieces);
             isCapture = true; // Ustawienie flagi na true, gdy pionek został zbity
         }
 
         draggedPiece->move(snappedX, snappedY);
-        if(!_board._dataAboutPawnPromotion._isPawnPromotion){
+        if(!_aiLogic->_board->_dataAboutPawnPromotion._isPawnPromotion){
             currentPlayerTurn = (currentPlayerTurn == WHITE) ? BLACK : WHITE;
-            _board.rotatePieces();
-            _clockWidget->togglePlayerTime();
-            _clockWidget->rotatePositionClocks();
-            _capturedPieces->RotateCapturedPieces();
-            _decorations->rotatePositionDecorations();   
         }        
 
-        if (_board.isCheckmate(currentPlayerTurn)) {
+        if (_aiLogic->_board->isCheckmate(currentPlayerTurn)) {
             _gameSounds->PlayEndGameSound();
             _isGameOver = true;
             _isMovingAllowed = false;
             _gameOver->whoWins(currentPlayerTurn, checkmate);
         }
-        else if (_board.isStalemate(currentPlayerTurn)) {
+        else if (_aiLogic->_board->isStalemate(currentPlayerTurn)) {
             std::cout << "Pat" << std::endl;
         }
-        else if(_board.isKingInCheck(currentPlayerTurn)){
+        else if(_aiLogic->_board->isKingInCheck(currentPlayerTurn)){
             _gameSounds->PlayCheckSound();
         }
         else if (!isCapture) { // Odtwórz dźwięk ruchu tylko wtedy, gdy pionek nie został zbity
@@ -272,37 +250,35 @@ void GameWith2State::stopDragging(sf::Vector2f& mousePosition) {
 }
 
 
-void GameWith2State::Update() {
+void GameWithAiState::Update() {
     // Usuwanie pionka, który doszedł do końca planszy
-    for(auto& piece : _board.b_pieces){
+    for(auto& piece : _aiLogic->_board->b_pieces){
         if(piece->getBoardPosition().x == -1 && piece->getBoardPosition().y == -1){
             std::cout << "Usunieto pionka" << std::endl;
-            _board.removePiece(piece->getBoardPosition().x, piece->getBoardPosition().y, nullptr);
+            _aiLogic->_board->removePiece(piece->getBoardPosition().x, piece->getBoardPosition().y, nullptr);
         }
     }
 
-    bool isWinnerbyTime = _clockWidget->Update();
-    if(isWinnerbyTime){
-        _isGameOver = true;
-        _isMovingAllowed = false;
-        _gameOver->whoWins(!currentPlayerTurn, timeEnd);
+
+    if(currentPlayerTurn == BLACK){
+        _aiLogic->aiMove(BLACK);
+        currentPlayerTurn = WHITE;
     }
+
     _gameOver->Update();
 }
 
-void GameWith2State::Draw() {
+void GameWithAiState::Draw() {
     sf::View view = sf::View(sf::FloatRect(0, 0, 800, 700));
     _data->window.setView(view);
     _data->window.clear(sf::Color( 58, 58, 58 ));
     
-    _board.drawBoard(_data->window, false);
+    _aiLogic->_board->drawBoard(_data->window, false);
 
     if (isDragging && draggedPiece && _isMovingAllowed) {
-        if(_isClockTimeSet){
-            _board.showPossibleMoves(_data->window, draggedPiece);
-            _board.showPossibleCaptures(_data->window, draggedPiece);
-            _board.markPieceField(_data->window, draggedPiece);
-        }
+        _aiLogic->_board->showPossibleMoves(_data->window, draggedPiece);
+        _aiLogic->_board->showPossibleCaptures(_data->window, draggedPiece);
+        _aiLogic->_board->markPieceField(_data->window, draggedPiece);
         sf::Vector2f mousePos = _data->inputManager.GetMousePosition(_data->window);
 
         sf::Vector2f temp;
@@ -310,22 +286,21 @@ void GameWith2State::Draw() {
         temp.y = mousePos.y - draggedPiece->getSprite().getGlobalBounds().height / 2;
         draggedPiece->move(temp);
     }
-    else if(selectedPiece && _isClockTimeSet && _isMovingAllowed){
-        _board.showPossibleMoves(_data->window, selectedPiece);
-        _board.showPossibleCaptures(_data->window, selectedPiece);
-        _board.markPieceField(_data->window, selectedPiece);
+    else if(selectedPiece && _isMovingAllowed){
+        _aiLogic->_board->showPossibleMoves(_data->window, selectedPiece);
+        _aiLogic->_board->showPossibleCaptures(_data->window, selectedPiece);
+        _aiLogic->_board->markPieceField(_data->window, selectedPiece);
     }
 
     
 
-    _board.showCheck(_data->window, currentPlayerTurn);
-    _board.drawPieces(_data->window, draggedPiece);
+    _aiLogic->_board->showCheck(_data->window, currentPlayerTurn);
+    _aiLogic->_board->drawPieces(_data->window, draggedPiece);
     _capturedPieces->Draw();
     _decorations->Draw();
-    _clockWidget->Draw();
     
-    if(_board._dataAboutPawnPromotion._isPawnPromotion){
-        _pawnPromotion->ChangePosition(_board._dataAboutPawnPromotion._pawnX, 50, _board._dataAboutPawnPromotion._pawnColor);
+    if(_aiLogic->_board->_dataAboutPawnPromotion._isPawnPromotion){
+        _pawnPromotion->ChangePosition(_aiLogic->_board->_dataAboutPawnPromotion._pawnX, 50, _aiLogic->_board->_dataAboutPawnPromotion._pawnColor);
         _pawnPromotion->Draw();
     }
 
@@ -338,13 +313,14 @@ void GameWith2State::Draw() {
 
 
 
-void GameWith2State::ClearObjects() {
-    _board.deleteObjects();
+void GameWithAiState::ClearObjects() {
+    _aiLogic->_board->deleteObjects();
     delete _decorations;
-    delete _clockWidget;
     delete _capturedPieces;
     delete _pawnPromotion;
     delete _gameSounds;
+    delete _gameOver;
+    delete _aiLogic;
     _data->soundManager.ClearSounds();
     _data->assetManager.clearAssets();
 }

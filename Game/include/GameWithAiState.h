@@ -6,16 +6,16 @@
 #include "Game.h"
 #include <string>
 #include <memory>
-#include "Clock.h"
 #include "CapturedPieces.h"
 #include "Decorations.h"
 #include "PawnPromotion.h"
 #include "GameSounds.h"
 #include "GameOver.h"
+#include "AiLogic.h"
 
-class GameWith2State : public State {
+class GameWithAiState : public State {
 public:
-    GameWith2State(GameDataRef data);
+    GameWithAiState(GameDataRef data);
 
 private:
     void Init() override;
@@ -35,7 +35,6 @@ private:
     
 
     GameDataRef _data;
-    Board _board;
 
     Piece *selectedPiece = nullptr;
 
@@ -46,7 +45,6 @@ private:
     Piece* draggedPiece = nullptr;
     bool isBoardRotated = false;
 
-    ClockWidget *_clockWidget;
     bool _isClockTimeSet = false;
 
 
@@ -59,4 +57,7 @@ private:
 
     bool _isMovingAllowed = true;
     bool _isGameOver = false;
+
+
+    AiLogic *_aiLogic;
 };

@@ -4,7 +4,7 @@
 
 struct DataAboutPawnPromotion
 {
-    bool _isPawnPromotion;
+    bool _isPawnPromotion = false;
     int _pawnColor;
     int _pawnX;
     int _pawnY;

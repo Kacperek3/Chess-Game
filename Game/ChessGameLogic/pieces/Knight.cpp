@@ -6,7 +6,7 @@ Knight::Knight() {
 }
 
 Knight::Knight(int color, int boardX, int boardY, Board* board, sf::Texture& knightTexture)
-    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Knight, boardX, boardY) 
+    : Piece(color, Position(boardX, boardY).getPixelPosition(), Piece::PieceType::Knight, boardX, boardY, 3) 
 {
     this->board = board;
     sprite.setTexture(knightTexture);

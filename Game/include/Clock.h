@@ -13,6 +13,10 @@
 #define BLACK 1
 #define NOTHING_POINTED 2
 
+#define BLACK_LOST 1
+#define WHITE_LOST 2
+
+
 
 class ClockWidget {
 
@@ -22,7 +26,7 @@ public:
     void Init();
     void StartButtonPressed();
     void inputTime(sf::Event event);
-    void Update();
+    bool Update();
     void inputTimeBlack(sf::Event event);
     void inputTimeWhite(sf::Event event);
     void togglePlayerTime();
