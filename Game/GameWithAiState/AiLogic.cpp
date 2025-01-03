@@ -13,27 +13,22 @@ AiLogic::~AiLogic(){
 
 int AiLogic::evaluatePosition(int color) {
     int score = 0;
-
+    std::cout << "Evaluating position" << std::endl;
     // Dodaj wartości materiału
-    for (Piece* piece : _board->playerPieces(color)) {
-        if(piece->getBoardPosition().x == -1 && piece->getBoardPosition().y == -1){
-            continue;
-        }
-        score += piece->getValue();
-    }
     for (Piece* piece : _board->enemyPieces(color)) {
         if(piece->getBoardPosition().x == -1 && piece->getBoardPosition().y == -1){
             continue;
         }
+        std::cout << piece->getBoardPosition().x << " " << piece->getBoardPosition().y << " "<<piece->getValue()<< std::endl;
+        score += piece->getValue();
+    }
+    std::cout << "Enemy pieces" << std::endl;
+    for (Piece* piece : _board->playerPieces(color)) {
+        if(piece->getBoardPosition().x == -1 && piece->getBoardPosition().y == -1){
+            continue;
+        }
+        std::cout << piece->getBoardPosition().x << " " << piece->getBoardPosition().y << " "<<piece->getValue()<< std::endl;
         score -= piece->getValue();
-    }
-
-    // Dodaj inne kryteria
-    if (_board->isKingInCheck(color)) {
-        score -= 5; // kara za szach
-    }
-    if (_board->isKingInCheck(1 - color)) {
-        score += 5; // nagroda za szach przeciwnika
     }
 
     if(_board->isCheckmate(1 - color)){
@@ -42,67 +37,94 @@ int AiLogic::evaluatePosition(int color) {
     if(_board->isCheckmate(color)){
         score += 10000;
     }
-
+    std::cout << "Score: " << score << std::endl;
 
 
     return score;
 }
 
 
-int AiLogic::minimax(int depth, int color, bool maximizingPlayer) {
-
+int AiLogic::minimax(int depth, int color, bool maximizingPlayer, int alpha, int beta) {
+    // Sprawdź warunki końcowe
     if (depth == 0 || _board->isCheckmate(color) || _board->isStalemate(color)) {
-        int eval = evaluatePosition(color);
-        return eval;
+        return evaluatePosition(color);
     }
 
-    int bestScore = maximizingPlayer ? -10000 : 10000;
+    if (maximizingPlayer) {
+        int maxEval = -10000;
+        auto allMoves = _board->getAllMoves(color);
 
-    // Pobierz wszystkie ruchy
-    auto allMoves = _board->getAllMoves(color);
+        for (const auto& move : allMoves) {
+            Piece* movedPiece = move.first;
+            Coordinate target = move.second;
+            Piece* capturedPiece = _board->getPieceAt(target.x, target.y);
 
-    for (const auto& move : allMoves) {
-        Piece* movedPiece = move.first;
-        Coordinate target = move.second;
-        Piece* capturedPiece = _board->getPieceAt(target.x, target.y);
+            if (!movedPiece) continue;
 
-        if (!movedPiece) {
-            std::cerr << "Error: movedPiece is null! Skipping move." << std::endl;
-            continue;
+            Coordinate originalPosition = movedPiece->getBoardPosition();
+
+            // Wykonaj ruch
+            movedPiece->simulateMove(target.x, target.y);
+            if (capturedPiece) capturedPiece->simulateMove(-1, -1);
+
+            // Rekurencja
+            int eval = minimax(depth - 1, 1 - color, false, alpha, beta);
+
+            // Cofnij ruch
+            movedPiece->simulateMove(originalPosition.x, originalPosition.y);
+            if (capturedPiece) capturedPiece->simulateMove(target.x, target.y);
+
+            // Aktualizuj wynik
+            maxEval = std::max(maxEval, eval);
+            alpha = std::max(alpha, eval);
+
+            // Przytnij
+            if (beta <= alpha) break;
         }
+        return maxEval;
 
-        Coordinate originalPosition = movedPiece->getBoardPosition();
+    } else {
+        int minEval = 10000;
+        auto allMoves = _board->getAllMoves(color);
 
-        // Wykonaj ruch
-        movedPiece->simulateMove(target.x, target.y);
-        if (capturedPiece) {
-            capturedPiece->simulateMove(-1, -1); // Usuń zbity pionek
+        for (const auto& move : allMoves) {
+            Piece* movedPiece = move.first;
+            Coordinate target = move.second;
+            Piece* capturedPiece = _board->getPieceAt(target.x, target.y);
+
+            if (!movedPiece) continue;
+
+            Coordinate originalPosition = movedPiece->getBoardPosition();
+
+            // Wykonaj ruch
+            movedPiece->simulateMove(target.x, target.y);
+            if (capturedPiece) capturedPiece->simulateMove(-1, -1);
+
+            // Rekurencja
+            int eval = minimax(depth - 1, 1 - color, true, alpha, beta);
+
+            // Cofnij ruch
+            movedPiece->simulateMove(originalPosition.x, originalPosition.y);
+            if (capturedPiece) capturedPiece->simulateMove(target.x, target.y);
+
+            // Aktualizuj wynik
+            minEval = std::min(minEval, eval);
+            beta = std::min(beta, eval);
+
+            // Przytnij
+            if (beta <= alpha) break;
         }
-
-        // Rekurencja
-        int score = minimax(depth - 1, 1 - color, !maximizingPlayer);
-
-        // Cofnij ruch
-        movedPiece->simulateMove(originalPosition.x, originalPosition.y);
-        if (capturedPiece) {
-            capturedPiece->simulateMove(target.x, target.y);
-        }
-        
-        // Aktualizuj najlepszy wynik
-        if (maximizingPlayer) {
-            bestScore = std::max(bestScore, score);
-        } else {
-            bestScore = std::min(bestScore, score);
-        }
+        return minEval;
     }
-
-    return bestScore;
 }
+
 
 
 std::pair<Piece*, Coordinate> AiLogic::getBestMove(int depth, int color) {
     int bestScore = -10000;
     std::pair<Piece*, Coordinate> bestMove;
+    int alpha = -10000, beta = 10000;
+
     auto allMoves = _board->getAllMoves(color);
 
     for (const auto& move : allMoves) {
@@ -113,30 +135,35 @@ std::pair<Piece*, Coordinate> AiLogic::getBestMove(int depth, int color) {
         Coordinate originalPosition = movedPiece->getBoardPosition();
 
         // Wykonaj ruch
-        movedPiece->move(target.x, target.y);
+        movedPiece->simulateMove(target.x, target.y);
         if (capturedPiece) capturedPiece->simulateMove(-1, -1);
 
-        // Sprawdź wynik
-        int score = minimax(depth - 1, 1 - color, false);
+        // Oblicz ocenę
+        int score = minimax(depth - 1, 1 - color, false, alpha, beta);
 
         // Cofnij ruch
         movedPiece->simulateMove(originalPosition.x, originalPosition.y);
-        if (capturedPiece) {
-            capturedPiece->simulateMove(target.x, target.y);
-        }
+        if (capturedPiece) capturedPiece->simulateMove(target.x, target.y);
 
         if (score > bestScore) {
             bestScore = score;
             bestMove = move;
         }
+        
+
+        alpha = std::max(alpha, score);
+        if (beta <= alpha) break; // Przycinanie
     }
+
+    std::cout << "Best Score: " << bestScore << std::endl;
 
     return bestMove;
 }
 
 
+
 void AiLogic::aiMove(int color) {
-    std::pair<Piece*, Coordinate> bestMove = getBestMove(4, color);
+    std::pair<Piece*, Coordinate> bestMove = getBestMove(5, color);
     Piece* movedPiece = bestMove.first;
     Coordinate target = bestMove.second;
 

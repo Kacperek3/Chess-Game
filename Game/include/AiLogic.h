@@ -10,7 +10,7 @@ public:
     AiLogic(GameDataRef data);
     ~AiLogic();
     int evaluatePosition(int color);
-    int minimax(int depth, int color, bool maximizingPlayer);
+    int minimax(int depth, int color, bool maximizingPlayer, int alpha, int beta);
     std::pair<Piece*, Coordinate> getBestMove(int depth, int color);
     void aiMove(int color);
 
