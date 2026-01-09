@@ -7,7 +7,6 @@ Board::Board(GameDataRef data) : _data(data), window(window) {
 
 
 void Board::Init() {
-    // do nothing
     _data->assetManager.LoadTexture("wk", "../assets/pieces/chessCom1/wk.png");
     _data->assetManager.LoadTexture("bk", "../assets/pieces/chessCom1/bk.png");
     _data->assetManager.LoadTexture("wp", "../assets/pieces/chessCom1/wp.png");
@@ -30,7 +29,7 @@ void Board::Init() {
     b_pieces.push_back(new King(BLACK, 4, 0, this, _data->assetManager.GetTexture("bk")));
     b_pieces.push_back(new Bishop(BLACK, 5, 0, this, _data->assetManager.GetTexture("bb")));
     b_pieces.push_back(new Knight(BLACK, 6, 0, this, _data->assetManager.GetTexture("bn")));
-     b_pieces.push_back(new Rook(BLACK, 7, 0, this, _data->assetManager.GetTexture("br")));
+    b_pieces.push_back(new Rook(BLACK, 7, 0, this, _data->assetManager.GetTexture("br")));
     for(int i = 0; i < 8; i++){
         b_pieces.push_back(new Pawn(BLACK, i, 1, this, UP, _data->assetManager.GetTexture("bp")));
     }
@@ -48,50 +47,6 @@ void Board::Init() {
     for(int i = 0; i < 8; i++){
         b_pieces.push_back(new Pawn(WHITE, i, 6, this, DOWN, _data->assetManager.GetTexture("wp")));
     }
-
-
-
-    // b_pieces.push_back(new Rook(BLACK, 1, 2, this, _data->assetManager.GetTexture("br")));
-    // b_pieces.push_back(new Bishop(BLACK, 3, 1, this, _data->assetManager.GetTexture("bb")));
-    // b_pieces.push_back(new Queen(BLACK, 1, 0, this, _data->assetManager.GetTexture("bq")));
-    // b_pieces.push_back(new King(BLACK, 4, 0, this, _data->assetManager.GetTexture("bk")));
-    // b_pieces.push_back(new Knight(BLACK, 5, 6, this, _data->assetManager.GetTexture("bn")));
-    // b_pieces.push_back(new Rook(BLACK, 7, 0, this, _data->assetManager.GetTexture("br")));
-    
-    // b_pieces.push_back(new Pawn(BLACK, 0, 1, this, UP, _data->assetManager.GetTexture("bp")));
-    // b_pieces.push_back(new Pawn(BLACK, 2, 1, this, UP, _data->assetManager.GetTexture("bp")));
-    // b_pieces.push_back(new Pawn(BLACK, 3, 3, this, UP, _data->assetManager.GetTexture("bp")));
-    // b_pieces.push_back(new Pawn(BLACK, 4, 2, this, UP, _data->assetManager.GetTexture("bp")));
-    // b_pieces.push_back(new Pawn(BLACK, 5, 1, this, UP, _data->assetManager.GetTexture("bp")));
-    // b_pieces.push_back(new Pawn(BLACK, 6, 1, this, UP, _data->assetManager.GetTexture("bp")));
-    // b_pieces.push_back(new Pawn(BLACK, 7, 1, this, UP, _data->assetManager.GetTexture("bp")));
-    
-    
-    
-  
-    // b_pieces.push_back(new Rook(WHITE, 0, 7, this, _data->assetManager.GetTexture("wr")));
-    // b_pieces.push_back(new Knight(WHITE, 1, 7, this, _data->assetManager.GetTexture("wn")));
-    // b_pieces.push_back(new Bishop(WHITE, 6, 3, this, _data->assetManager.GetTexture("wb")));
-    
-    // b_pieces.push_back(new Queen(WHITE, 1, 4, this, _data->assetManager.GetTexture("wq")));
-    // b_pieces.push_back(new King(WHITE, 3, 7, this, _data->assetManager.GetTexture("wk")));
-    // b_pieces.push_back(new Bishop(WHITE, 5, 7, this, _data->assetManager.GetTexture("wb")));
-    // b_pieces.push_back(new Knight(WHITE, 4, 6, this, _data->assetManager.GetTexture("wn")));
-    // b_pieces.push_back(new Rook(WHITE, 7, 7, this, _data->assetManager.GetTexture("wr")));
-    // b_pieces.push_back(new Pawn(WHITE, 0, 6, this, DOWN, _data->assetManager.GetTexture("wp")));
-    // b_pieces.push_back(new Pawn(WHITE, 1, 5, this, DOWN, _data->assetManager.GetTexture("wp")));
-    // b_pieces.push_back(new Pawn(WHITE, 3, 4, this, DOWN, _data->assetManager.GetTexture("wp")));
-    // b_pieces.push_back(new Pawn(WHITE, 6, 6, this, DOWN, _data->assetManager.GetTexture("wp")));
-    // b_pieces.push_back(new Pawn(WHITE, 7, 6, this, DOWN, _data->assetManager.GetTexture("wp")));
-
-
-
-
-
-
-
-
-
 
 
 

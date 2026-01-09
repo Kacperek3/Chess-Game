@@ -1,15 +1,47 @@
 #include "AiLogic.h"
 #include "Pieces.h"
-
+#include <iomanip>
 
 AiLogic::AiLogic(GameDataRef data): _data(data){
     _board = new Board(data);
     _board->Init();
+
+    initializeZobristTable();
 }
 
 AiLogic::~AiLogic(){
     delete _board;
 }
+
+void AiLogic::initializeZobristTable() {
+    std::mt19937_64 generator(123456); // Stały seed dla powtarzalności
+    std::uniform_int_distribution<uint64_t> distribution(0, UINT64_MAX);
+
+    for (int square = 0; square < 64; ++square) {
+        for (int piece = 0; piece < 12; ++piece) {
+            zobristTable[square][piece] = distribution(generator);
+        }
+    }
+}
+
+uint64_t AiLogic::computeZobristHash(Board* board) {
+    uint64_t hash = 0;
+
+    for (int y = 0; y < 8; ++y) {
+        for (int x = 0; x < 8; ++x) {
+            Piece* piece = board->getPieceAt(x, y);
+            if (piece) {
+                int pieceIndex = static_cast<int>(piece->getType()) + (piece->getColor() == WHITE ? 0 : 6);
+                int squareIndex = y * 8 + x;
+                hash ^= zobristTable[squareIndex][pieceIndex];
+            }
+        }
+    }
+
+    return hash;
+}
+
+
 
 void AiLogic::handleCastle(Piece* movedPiece, const Coordinate& target, Piece*& rook, Coordinate& rookOriginalPosition, Coordinate& rookTargetPosition) {
     if (movedPiece->getType() == Piece::PieceType::King) {
@@ -37,7 +69,7 @@ void AiLogic::undoCastle(Piece* rook, const Coordinate& rookOriginalPosition) {
     }
 }
 
-int AiLogic::getPositionValue(Piece* piece) {
+float AiLogic::getPositionValue(Piece* piece) {
     if (!piece) return 0;
 
     Coordinate pos = piece->getBoardPosition();
@@ -84,6 +116,21 @@ int AiLogic::canBeCapturedRecursive(Piece* piece) {
 }
 
 
+bool AiLogic::isPromisingMove(Piece* movedPiece, Coordinate target) {
+    Piece* targetPiece = _board->getPieceAt(target.x, target.y);
+
+    // // Szachowanie króla przeciwnika
+    // if (_board->isKingInCheck(1 - movedPiece->getColor())) {
+    //     return true;
+    // }
+
+    // Bicie wartościowej figury
+    if (targetPiece && targetPiece->getValue() > movedPiece->getValue()) {
+        return true;
+    }
+
+    return false;
+}
 
 float AiLogic::evaluatePositionBlack(int color, Piece* RecentlyMovedPiece, int depth) {
     float score = 0;
@@ -104,7 +151,7 @@ float AiLogic::evaluatePositionBlack(int color, Piece* RecentlyMovedPiece, int d
     }
 
     if(canBeCaptured(RecentlyMovedPiece) && RecentlyMovedPiece->getColor() == BLACK){
-        score -= RecentlyMovedPiece->getValue() - getPositionValue(RecentlyMovedPiece);
+        score -= float(RecentlyMovedPiece->getValue()) - getPositionValue(RecentlyMovedPiece);
     }
 
     if(_board->isCheckmate(color)){
@@ -152,11 +199,21 @@ float AiLogic::evaluatePositionWhite(int color, Piece* RecentlyMovedPiece, int d
 
 
 float AiLogic::minimax(int depth, int color, bool maximizingPlayer, float alpha, float beta, Piece* RecentlyMovedPiece) {
-    if (depth == 0 || _board->isCheckmate(color) || _board->isStalemate(color)) {
-        if (color == WHITE) 
-            return evaluatePositionWhite(color, RecentlyMovedPiece, depth);
-        else 
-            return evaluatePositionBlack(color, RecentlyMovedPiece, depth);
+    uint64_t currentHash = computeZobristHash(_board);
+
+    std::cout << depth << std::endl;
+    // Sprawdź tabelę transpozycji
+    if (transpositionTable.find(currentHash) != transpositionTable.end()) {
+        return transpositionTable[currentHash];
+    }
+
+    if (depth <= 0 || _board->isCheckmate(color) || _board->isStalemate(color)) {
+        float eval = (color == WHITE)
+            ? evaluatePositionWhite(color, RecentlyMovedPiece, depth)
+            : evaluatePositionBlack(color, RecentlyMovedPiece, depth);
+
+        transpositionTable[currentHash] = eval;
+        return eval;
     }
 
     if (maximizingPlayer) {
@@ -167,41 +224,42 @@ float AiLogic::minimax(int depth, int color, bool maximizingPlayer, float alpha,
             Piece* movedPiece = move.first;
             Coordinate target = move.second;
 
-            if(movedPiece->getBoardPosition().x == -1 && movedPiece->getBoardPosition().y == -1){
-                continue;
-            }
-
-
             Piece* capturedPiece = _board->getPieceAt(target.x, target.y);
-
-            if (!movedPiece) continue;
 
             Coordinate originalPosition = movedPiece->getBoardPosition();
             Coordinate rookOriginalPosition, rookTargetPosition;
             Piece* rook = nullptr;
 
             handleCastle(movedPiece, target, rook, rookOriginalPosition, rookTargetPosition);
-            
+
             // Wykonaj ruch
             movedPiece->simulateMove(target.x, target.y);
             if (capturedPiece) capturedPiece->simulateMove(-1, -1);
             if (rook) rook->simulateMove(rookTargetPosition.x, rookTargetPosition.y);
 
+            // Dynamiczna zmiana głębokości
+            int newDepth = depth;
+            if (isPromisingMove(movedPiece, target)) {
+                newDepth += 1; // Zwiększ głębokość dla obiecujących ruchów
+            } else if (capturedPiece == nullptr && !isPromisingMove(movedPiece, target)) {
+                newDepth -= 1; // Zmniejsz głębokość dla mało obiecujących ruchów
+            }
+
             // Rekurencja
-            float eval = minimax(depth - 1, 1 - color, false, alpha, beta, movedPiece);
+            float eval = minimax(newDepth - 1, 1 - color, false, alpha, beta, movedPiece);
 
             // Cofnij ruch
             movedPiece->simulateMove(originalPosition.x, originalPosition.y);
             if (capturedPiece) capturedPiece->simulateMove(target.x, target.y);
             undoCastle(rook, rookOriginalPosition);
 
-            // Aktualizuj wynik
             maxEval = std::max(maxEval, eval);
             alpha = std::max(alpha, eval);
 
-            // Przytnij
-            if (beta <= alpha) break;
+            if (beta <= alpha) break; // Przycinanie
         }
+
+        transpositionTable[currentHash] = maxEval;
         return maxEval;
 
     } else {
@@ -212,13 +270,7 @@ float AiLogic::minimax(int depth, int color, bool maximizingPlayer, float alpha,
             Piece* movedPiece = move.first;
             Coordinate target = move.second;
 
-            if(movedPiece->getBoardPosition().x == -1 && movedPiece->getBoardPosition().y == -1){
-                continue;
-            }
-
             Piece* capturedPiece = _board->getPieceAt(target.x, target.y);
-
-            if (!movedPiece) continue;
 
             Coordinate originalPosition = movedPiece->getBoardPosition();
             Coordinate rookOriginalPosition, rookTargetPosition;
@@ -231,24 +283,34 @@ float AiLogic::minimax(int depth, int color, bool maximizingPlayer, float alpha,
             if (capturedPiece) capturedPiece->simulateMove(-1, -1);
             if (rook) rook->simulateMove(rookTargetPosition.x, rookTargetPosition.y);
 
+            // Dynamiczna zmiana głębokości
+            int newDepth = depth;
+            if (isPromisingMove(movedPiece, target)) {
+                newDepth += 1;
+            } else if (capturedPiece == nullptr && !isPromisingMove(movedPiece, target)) {
+                newDepth -= 1;
+            }
+
             // Rekurencja
-            float eval = minimax(depth - 1, 1 - color, true, alpha, beta, movedPiece);
+            float eval = minimax(newDepth - 1, 1 - color, true, alpha, beta, movedPiece);
 
             // Cofnij ruch
             movedPiece->simulateMove(originalPosition.x, originalPosition.y);
             if (capturedPiece) capturedPiece->simulateMove(target.x, target.y);
             undoCastle(rook, rookOriginalPosition);
 
-            // Aktualizuj wynik
             minEval = std::min(minEval, eval);
             beta = std::min(beta, eval);
 
-            // Przytnij
-            if (beta <= alpha) break;
+            if (beta <= alpha) break; // Przycinanie
         }
+
+        transpositionTable[currentHash] = minEval;
         return minEval;
     }
 }
+
+
 
 
 std::vector<std::pair<Piece*, Coordinate>> AiLogic::getAllMovesSorted(int color) {
@@ -323,7 +385,6 @@ std::pair<Piece*, Coordinate> AiLogic::getBestMove(int depth, int color) {
         alpha = std::max(alpha, score);
         if (beta <= alpha) break; // Przycinanie
     }
-
     std::cout << "Best Score: " << bestScore << std::endl;
 
     return bestMove;
@@ -342,7 +403,7 @@ std::pair<Piece*, Coordinate> AiLogic::getBestMoveIterative(int maxDepth, int co
 
 
 void AiLogic::aiMove(int color) {
-    std::pair<Piece*, Coordinate> bestMove = getBestMoveIterative(5, color);
+    std::pair<Piece*, Coordinate> bestMove = getBestMove(8, color);
     Piece* movedPiece = bestMove.first;
     Coordinate target = bestMove.second;
 
