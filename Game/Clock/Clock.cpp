@@ -88,7 +88,7 @@ void ClockWidget::StartButtonPressed() {
     if(_data->inputManager.IsSpriteClicked(_backgroudn_to_textFieldBlack, sf::Mouse::Left, _data->window)){
         _whichClockPointed = BLACK;
         _backgroudn_to_textFieldBlack.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_BLACK_POINTED"));
-        _textFieldBlack->setFillColor(sf::Color(255,255,255)); // czysty bialy
+        _textFieldBlack->setFillColor(sf::Color(255,255,255)); 
         _isClockBlackIconVisible = false;
 
         _backgroudn_to_textFieldWhite.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD"));
@@ -98,32 +98,29 @@ void ClockWidget::StartButtonPressed() {
     else if(_data->inputManager.IsSpriteClicked(_backgroudn_to_textFieldWhite, sf::Mouse::Left, _data->window)){
         _whichClockPointed = WHITE;
         _backgroudn_to_textFieldWhite.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_POINTED"));
-        _textFieldWhite->setFillColor(sf::Color(0,0,0)); // czysty bialy
+        _textFieldWhite->setFillColor(sf::Color(0,0,0)); 
         _isClockWhiteIconVisible = false;
 
         _backgroudn_to_textFieldBlack.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_BLACK"));
-        _textFieldBlack->setFillColor(sf::Color(200,200,200)); // taki szarawy
+        _textFieldBlack->setFillColor(sf::Color(200,200,200)); 
         _isClockBlackIconVisible = true;
     }
 
 
     if (_data->inputManager.IsSpriteClicked(_startButton, sf::Mouse::Left, _data->window)) {
         try {
-            //konwertowanie czasu z inputText na int i zapisanie go w remainingTimeInSeconds
             int minutes = std::stoi(inputTextBlack.substr(0, 2));
             int seconds = std::stoi(inputTextBlack.substr(3, 2));
             remainingTimeInSecondsBlack = minutes * 60 + seconds;
             countdownClockBlack->restart();
             isCountdownActiveBlack = false;
 
-            // to samo ale dla bialego
             minutes = std::stoi(inputTextWhite.substr(0, 2));
             seconds = std::stoi(inputTextWhite.substr(3, 2));
             remainingTimeInSecondsWhite = minutes * 60 + seconds;
             countdownClockWhite->restart();
             isCountdownActiveWhite = true;
 
-            //Ustawienie aby na poczatku zegar bialego byl podswietlony
             _whichClockPointed = WHITE;
             _backgroudn_to_textFieldBlack.setTexture(_data->assetManager.GetTexture("BACKGROUND_TO_TEXTFIELD_BLACK"));
             _textFieldBlack->setFillColor(sf::Color(200,200,200));
@@ -234,7 +231,6 @@ bool ClockWidget::Update(){
                 return BLACK_LOST;
             }
 
-            // Aktualizuj tekst wyświetlany w _textFieldBlack
             int minutes = remainingTimeInSecondsBlack / 60;
             int seconds = remainingTimeInSecondsBlack % 60;
             std::ostringstream timeStream;

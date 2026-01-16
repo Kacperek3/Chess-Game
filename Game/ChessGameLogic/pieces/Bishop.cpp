@@ -17,10 +17,10 @@ std::vector<Coordinate> Bishop::getPossibleMoves() {
     std::vector<Coordinate> possibleMoves;
 
     int directions[4][2] = {
-        {1, 1},   // Przekątna w prawo w dół
-        {-1, 1},  // Przekątna w lewo w dół
-        {-1, -1}, // Przekątna w lewo w górę
-        {1, -1}   // Przekątna w prawo w górę
+        {1, 1},   
+        {-1, 1},  
+        {-1, -1}, 
+        {1, -1}   
     };
 
     for (auto& direction : directions) {
@@ -30,24 +30,21 @@ std::vector<Coordinate> Bishop::getPossibleMoves() {
         int x = boardPosition.x;
         int y = boardPosition.y;
 
-        // Przechodzimy w danym kierunku, dopóki możemy się poruszać
         while (true) {
             x += dx;
             y += dy;
 
-            // Sprawdzenie, czy współrzędne są w granicach planszy
             if (board->isWithinBounds(x, y)) {
                 if (board->isEmpty(x, y)) {
                     possibleMoves.push_back(Coordinate(x, y));
                 } else {
-                    // Jeśli jest to bierka przeciwnika, dodajemy ruch, ale nie możemy iść dalej
                     if (board->isEnemyPieceAt(x, y, m_color)) {
                         possibleMoves.push_back(Coordinate(x, y));
                     }
-                    break; // Przerywamy pętlę, bo natrafiliśmy na bierkę
+                    break; 
                 }
             } else {
-                break; // Wyszedłeś poza planszę
+                break; 
             }
         }
     }
@@ -59,10 +56,10 @@ std::vector<Coordinate> Bishop::getPossibleCaptures() {
     std::vector<Coordinate> possibleCaptures;
 
     int directions[4][2] = {
-        {1, 1},   // Przekątna w prawo w dół
-        {-1, 1},  // Przekątna w lewo w dół
-        {-1, -1}, // Przekątna w lewo w górę
-        {1, -1}   // Przekątna w prawo w górę
+        {1, 1},  
+        {-1, 1}, 
+        {-1, -1}, 
+        {1, -1}   
     };
 
     for (auto& direction : directions) {
@@ -72,22 +69,19 @@ std::vector<Coordinate> Bishop::getPossibleCaptures() {
         int x = boardPosition.x;
         int y = boardPosition.y;
 
-        // Przechodzimy w danym kierunku, dopóki nie napotkamy figur
         while (true) {
             x += dx;
             y += dy;
 
-            // Sprawdzenie, czy współrzędne są w granicach planszy
             if (board->isWithinBounds(x, y)) {
                 if (!board->isEmpty(x, y)) {
-                    // Jeśli jest to bierka przeciwnika, dodajemy ją jako możliwy ruch
                     if (board->isEnemyPieceAt(x, y, m_color)) {
                         possibleCaptures.push_back(Coordinate(x, y));
                     }
-                    break; // Natrafiliśmy na bierkę, więc nie możemy dalej iść w tym kierunku
+                    break; 
                 }
             } else {
-                break; // Wyszedłeś poza planszę
+                break; 
             }
         }
     }
@@ -97,25 +91,22 @@ std::vector<Coordinate> Bishop::getPossibleCaptures() {
 
 bool Bishop::isValidMove(int boardX, int boardY) {
     if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
-        return false;  // Ruch poza planszę
+        return false;  
     }
 
     int dx = abs(boardX - boardPosition.x);
     int dy = abs(boardY - boardPosition.y);
 
-    // Sprawdzenie, czy ruch jest po przekątnej (|deltaX| == |deltaY|)
     if (dx == dy) {
-        // Sprawdzenie, czy droga do docelowej pozycji jest wolna
         int xDirection = (boardX - boardPosition.x > 0) ? 1 : -1;
         int yDirection = (boardY - boardPosition.y > 0) ? 1 : -1;
         
-        for (int i = 1; i < dx; ++i) {  // Sprawdź każde pole na drodze
+        for (int i = 1; i < dx; ++i) {  
             if (!board->isEmpty(boardPosition.x + i * xDirection, boardPosition.y + i * yDirection)) {
-                return false;  // Jeśli na drodze jest figura, ruch jest niedozwolony
+                return false;  
             }
         }
 
-        // Jeżeli docelowe pole jest puste, lub znajduje się na nim figura przeciwnika
         if (board->isEmpty(boardX, boardY)) {
             return true;
         } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
@@ -123,7 +114,7 @@ bool Bishop::isValidMove(int boardX, int boardY) {
         }
     }
 
-    return false;  // W innych przypadkach ruch jest niedozwolony
+    return false;  
 }
 
 void Bishop::rotatePiece() {

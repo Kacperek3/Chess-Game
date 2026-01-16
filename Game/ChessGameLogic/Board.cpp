@@ -21,7 +21,7 @@ void Board::Init() {
     _data->assetManager.LoadTexture("bn", "../assets/pieces/chessCom1/bn.png");
 
 
-    // czarne bierki
+    // black pieces
     b_pieces.push_back(new Rook(BLACK, 0, 0, this, _data->assetManager.GetTexture("br")));
     b_pieces.push_back(new Knight(BLACK, 1, 0, this, _data->assetManager.GetTexture("bn")));
     b_pieces.push_back(new Bishop(BLACK, 2, 0, this, _data->assetManager.GetTexture("bb")));
@@ -35,7 +35,7 @@ void Board::Init() {
     }
 
 
-    //biale bierki
+    // white pieces 
     b_pieces.push_back(new Rook(WHITE, 0, 7, this, _data->assetManager.GetTexture("wr")));
     b_pieces.push_back(new Knight(WHITE, 1, 7, this, _data->assetManager.GetTexture("wn")));
     b_pieces.push_back(new Bishop(WHITE, 2, 7, this, _data->assetManager.GetTexture("wb")));
@@ -47,10 +47,6 @@ void Board::Init() {
     for(int i = 0; i < 8; i++){
         b_pieces.push_back(new Pawn(WHITE, i, 6, this, DOWN, _data->assetManager.GetTexture("wp")));
     }
-
-
-
-
 
     tile = new sf::RectangleShape(sf::Vector2f(75, 75));
     recColor = new sf::Color(245, 90, 105, 128);
@@ -78,7 +74,7 @@ void Board::deleteObjects(){
 }
 
 Board::~Board() {
-    std::cout << "Usunieto board" << std::endl;
+    std::cout << "deleted board" << std::endl;
 }
 
 void Board::addQueen(int color, int boardX, int boardY){
@@ -129,18 +125,14 @@ void Board::removePiece(int boardX, int boardY, CapturedPieces* capturedPieces) 
                 capturedPieces->AddCapturedPiece((*it)->getTypeName(), (*it)->getColor());
             } 
             
-            delete *it;                // Usunięcie obiektu
-            it = b_pieces.erase(it);    // Usuń element z wektora i zaktualizuj iterator
+            delete *it;               
+            it = b_pieces.erase(it);  
         } else {
-            ++it; // Przejdź do następnego elementu tylko wtedy, gdy nie usuwasz elementu
+            ++it;
         }
     }
 }
 
-
-
-//-------------------------------------------------------------------------------------------
-// logika matowania krola
 
 
 Piece* Board::findKing(int color) {
@@ -149,7 +141,7 @@ Piece* Board::findKing(int color) {
             return piece;
         }
     }
-    return nullptr; // nigdy nie powinno dojść do tego miejsca w normalnej grze
+    return nullptr; 
 }
 
 
@@ -167,11 +159,9 @@ Piece* Board::getRookForCastle(Piece* king, Coordinate targetPosition) {
     int boardY = targetPosition.y;
 
     if (boardX == 6 && boardY == king->getBoardPosition().y) {
-        std::cout << "Penis jestem tu" << std::endl;
         Piece * rook = getPieceAt(7, boardY);
         return rook;
     } else if (boardX == 2 && boardY == king->getBoardPosition().y) {
-        std::cout << "Penis jestem tu2"<< std::endl;
         return dynamic_cast<Rook*>(getPieceAt(0, boardY));
     }
     return nullptr;
@@ -227,7 +217,7 @@ std::vector<Piece*> Board::enemyPieces(int color) const{
 
 std::vector<Coordinate> Board::getValidMoves(Piece* piece) {
     std::vector<Coordinate> validMoves;
-    std::vector<Coordinate> allMoves = piece->getPossibleMoves();  // Get all possible moves for the piece
+    std::vector<Coordinate> allMoves = piece->getPossibleMoves();
 
     for (auto& move : allMoves) {
         if (isWithinBounds(move.x, move.y) && !isKingInCheckAfterMove(piece, move)) {
@@ -239,7 +229,7 @@ std::vector<Coordinate> Board::getValidMoves(Piece* piece) {
 }
 std::vector<Coordinate> Board::getValidCaptures(Piece* piece) {
     std::vector<Coordinate> validCaptures;
-    std::vector<Coordinate> allCaptures = piece->getPossibleCaptures();  // Get all possible moves for the piece
+    std::vector<Coordinate> allCaptures = piece->getPossibleCaptures();  
 
     for (auto& capture : allCaptures) {
         if (isWithinBounds(capture.x, capture.y) && !isKingInCheckAfterMove(piece, capture)) {
@@ -250,52 +240,56 @@ std::vector<Coordinate> Board::getValidCaptures(Piece* piece) {
     return validCaptures;
 }
 
-std::vector<std::pair<Piece*, Coordinate>> Board::getAllMoves(int color) {
-    std::vector<std::pair<Piece*, Coordinate>> allMoves;
-    for (Piece* piece : playerPieces(color)) {
-        auto moves = getValidMoves(piece);
-        for (const auto& move : moves) {
-            allMoves.push_back({piece, move});
+void Board::generateAllMoves(int color, MoveList& list) {
+    list.count = 0; 
+    
+    for (Piece* piece : b_pieces) {
+        if (piece->getBoardPosition().x == -1 || piece->getColor() != color) continue;
+       auto moves = piece->getPossibleMoves(); 
+        Coordinate originalPos = piece->getBoardPosition();
+
+        for (const auto& target : moves) {
+            if (!isWithinBounds(target.x, target.y)) continue;
+            
+            Piece* targetPiece = getPieceAt(target.x, target.y); 
+            if (targetPiece && targetPiece->getColor() == color) continue;
+
+            if (!isKingInCheckAfterMove(piece, target)) {
+                list.add(piece, target.x, target.y);
+            }
         }
     }
-    return allMoves;
 }
 
-
-
-
 void Board::undoMove(Piece* piece, Coordinate originalPosition, Piece* capturedPiece) {
-    // przywrocenie oryginalnej pozycji
     piece->simulateMove(originalPosition.x, originalPosition.y);
 
-    // jesli byla zbita jakas figura to dodaj ja z powrotem
     if (capturedPiece) {
         b_pieces.push_back(capturedPiece);
     }
 }
-
 
 bool Board::isKingInCheckAfterMove(Piece* movedPiece, Coordinate targetPosition) {
     Coordinate originalPosition = movedPiece->getBoardPosition();
     Piece* capturedPiece = nullptr;
 
     for (auto& piece : b_pieces) {
-        if (piece->getBoardPosition().x == targetPosition.x && piece->getBoardPosition().y == targetPosition.y) {
+        if (piece != movedPiece && piece->getBoardPosition().x != -1 &&
+            piece->getBoardPosition().x == targetPosition.x && 
+            piece->getBoardPosition().y == targetPosition.y) {
             capturedPiece = piece;
             break;
         }
     }
 
-
     if (capturedPiece != nullptr) {
         capturedPiece->simulateMove(-1, -1);
     }
-
     movedPiece->simulateMove(targetPosition.x, targetPosition.y);
+    
     bool isCheck = isKingInCheck(movedPiece->getColor());
 
     movedPiece->simulateMove(originalPosition.x, originalPosition.y);
-
     if (capturedPiece != nullptr) {
         capturedPiece->simulateMove(targetPosition.x, targetPosition.y);
     }
@@ -303,15 +297,18 @@ bool Board::isKingInCheckAfterMove(Piece* movedPiece, Coordinate targetPosition)
     return isCheck;
 }
 
-
 bool Board::isKingInCheck(int color) {
-    King* king = dynamic_cast<King*>(findKing(color));
-    if(king == nullptr){
-        std::cout << "Nie znaleziono krola" << std::endl;
+    Piece* kingPiece = findKing(color);
+    if(kingPiece == nullptr){
+        return false; 
     }
-    Coordinate kingPosition = king->getBoardPosition();
+    Coordinate kingPosition = kingPiece->getBoardPosition();
 
     for (auto& piece : b_pieces) {
+        if (piece->getBoardPosition().x == -1 || piece->getBoardPosition().y == -1) {
+            continue;
+        }
+
         if (piece->getColor() != color) {
             if (piece->isValidMove(kingPosition.x, kingPosition.y)) {
                 return true;
@@ -321,13 +318,12 @@ bool Board::isKingInCheck(int color) {
     return false;
 }
 
-
 bool Board::canKingMove(int color) {
     King* king = dynamic_cast<King*>(findKing(color));
     Coordinate kingPosition = king->getBoardPosition();
     for (int dx = -1; dx <= 1; ++dx) {
         for (int dy = -1; dy <= 1; ++dy) {
-            if (dx == 0 && dy == 0) continue;  // Ignoruj bieżącą pozycję króla
+            if (dx == 0 && dy == 0) continue;  
 
             int newX = kingPosition.x + dx;
             int newY = kingPosition.y + dy;
@@ -335,11 +331,9 @@ bool Board::canKingMove(int color) {
             Coordinate targetPosition(newX, newY);
 
 
-            // Sprawdź, czy nowe pole jest w granicach planszy
             if (isWithinBounds(newX, newY)) {
-                // Sprawdź, czy król może się tam poruszyć bez bycia szachowanym
                 if (!isKingInCheckAfterMove(king, targetPosition) && !isTeamPieceAt(newX, newY, color)) {
-                    return true;  // Król ma bezpieczny ruch
+                    return true;
                 }
             }
         }
@@ -353,7 +347,6 @@ bool Board::canPreventCheck(int color) {
         Coordinate originalPosition = piece->getBoardPosition();
         
         for (const auto& move : validMoves) {
-            // Symuluj ruch
 
             if(!isKingInCheckAfterMove(piece, move)){
                 return true;
@@ -361,26 +354,23 @@ bool Board::canPreventCheck(int color) {
         }
     }
     return false;
-
-
-    // to do, co jesli przeciwnik może ochronić króla przed matem bijąc jakąś figure
 }
 
 
 bool Board::isCheckmate(int color) {
     if (!isKingInCheck(color)) {
-        return false;  // Król nie jest w szachu
+        return false;  
     }
 
     if (canKingMove(color)) {
-        return false;  // Król może się poruszać
+        return false;  
     }
 
     if (canPreventCheck(color)) {
-        return false;  // Gracz może zapobiec szachowi
+        return false;  
     }
 
-    return true;  // Gracz jest w szachu mat
+    return true; 
 }
 
 
@@ -394,24 +384,17 @@ bool Board::isStalemate(int color) {
         return false;
     }
 
-    // Sprawdź, czy jakakolwiek inna figura może się ruszyć lub zapobiec szachowi
     for (Piece* piece : playerPieces(color)) {
         std::vector<Coordinate> validMoves = piece->getPossibleMoves();
         for (const auto& move : validMoves) {
-            // Sprawdz czy twoja bierka nie jest zwiazana
             if (!isKingInCheckAfterMove(piece, move)) {
-                return false;  // jesli nie jest to znaczy ze moze sie ruszyc i jest to pat
+                return false;  
             }
         }
     }
 
     return true;
 }
-
-
-
-
-// funkcje odpowiedzialne za rysowanie planszy i bierki itp
 
 void Board::showPossibleMoves(sf::RenderWindow& window, Piece* piece){
     std::vector<Coordinate> possibleMoves = getValidMoves(piece);
@@ -467,7 +450,6 @@ void Board::drawBoard(sf::RenderWindow& window, bool showCoordinates) {
             
             tile->setPosition(col * 75, row * 75 + 50);
 
-            // Kolorowanie kafelków
             if ((row + col) % 2 == 0) {
                 tile->setFillColor(*lightColor); 
             } else {

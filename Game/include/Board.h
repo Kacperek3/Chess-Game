@@ -12,6 +12,7 @@
 #include "Knight.h"
 #include "CapturedPieces.h"
 #include "DataAboutPawnPromotion.h"
+#include "Move.h"
 
 class Board {
 public:
@@ -40,8 +41,8 @@ public:
     void showPossibleCaptures(sf::RenderWindow& window, Piece* piece); 
     void showCheck(sf::RenderWindow& window, int color);
     void markPieceField(sf::RenderWindow& window, Piece* piece);
-    std::vector<std::pair<Piece*, Coordinate>> getAllMoves(int color);
     bool isStalemate(int color);
+    void generateAllMoves(int color, MoveList& list);
     Piece* getPieceAt(int x, int y);
     Piece* getRookForCastle(Piece* king, Coordinate targetPosition);
     Coordinate getRookTargetForCastle(Coordinate targetPosition);

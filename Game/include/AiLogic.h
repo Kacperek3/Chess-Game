@@ -5,23 +5,44 @@
 #include <random>
 #include <cstdint>
 #include <unordered_map>
-
+#include "Move.h"
 
 class AiLogic {
 public:
 
     AiLogic(GameDataRef data);
     ~AiLogic();
-    float evaluatePositionWhite(int color, Piece* RecentlyMovedPiece, int depth);
-    float evaluatePositionBlack(int color, Piece* RecentlyMovedPiece, int depthfloat);
+    float evaluate(int color);
 
-    float minimax(int depth, int color, bool maximizingPlayer, float alpha, float beta, Piece* RecentlyMovedPiece);
+    float negaMax(int depth, int color, float alpha, float beta);
     std::pair<Piece*, Coordinate> getBestMove(int depth, int color);
     void aiMove(int color);
-
+    float quiescence(float alpha, float beta, int color, int qDepth);
     Board *_board;
 
+
+
+    struct TTEntry {
+        uint64_t hash;
+        float score;
+        int depth;
+        int flag; // 0 = EXACT (Dokładny), 1 = ALPHA (Górna granica), 2 = BETA (Dolna granica)
+        int bestMoveSrcX, bestMoveSrcY;
+        int bestMoveDstX, bestMoveDstY;
+    };
+
 private:
+
+
+    static const int TT_SIZE = 1048576; 
+    TTEntry transpositionTable[TT_SIZE];
+
+    // Funkcje pomocnicze
+    void clearTT();
+    void storeTT(uint64_t hash, float score, int depth, int flag, Piece* bestPiece, Coordinate bestTarget);
+    bool probeTT(uint64_t hash, int depth, float alpha, float beta, float& score, Piece*& bestPiece, Coordinate& bestTarget);
+
+
     float getPositionValue(Piece* piece);
     bool canBeCaptured(Piece* piece);
     int canBeCapturedRecursive(Piece* piece);
@@ -30,15 +51,13 @@ private:
     void initializeZobristTable();
     uint64_t computeZobristHash(Board* board);
     bool isPromisingMove(Piece* movedPiece, Coordinate target);
-
-
-    std::vector<std::pair<Piece*, Coordinate>>getAllMovesSorted(int color);
+    bool isEndgamePhase();
+    void getSortedMoves(int color, MoveList& moves, Piece* ttPiece, Coordinate ttTarget);
     std::pair<Piece*, Coordinate> getBestMoveIterative(int maxDepth, int color);
 
     GameDataRef _data;
 
     uint64_t zobristTable[64][12];
-    std::unordered_map<uint64_t, float> transpositionTable;
 
     const float pawnBlackPositionValues[8][8] = {
         {0, 0, 0, 0, 0, 0, 0, 0},
@@ -51,7 +70,17 @@ private:
         {0, 0, 0, 0, 0, 0, 0, 0}
     };
 
-
+   const float kingEndgameValues[8][8] = {
+        {-5, -4, -3, -2, -2, -3, -4, -5},
+        {-3, -2, -1,  0,  0, -1, -2, -3},
+        {-3, -1,  2,  3,  3,  2, -1, -3},
+        {-3, -1,  3,  4,  4,  3, -1, -3},
+        {-3, -1,  3,  4,  4,  3, -1, -3},
+        {-3, -1,  2,  3,  3,  2, -1, -3},
+        {-3, -3,  0,  0,  0,  0, -3, -3},
+        {-5, -3, -3, -3, -3, -3, -3, -5}
+    }; 
+    
     const float pawnWhitePositionValues[8][8] = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {1.0, 1.0, 1.2, 1.5, 1.5, 1.2, 1.0, 1.0},
@@ -134,3 +163,4 @@ private:
     };
 
 };
+

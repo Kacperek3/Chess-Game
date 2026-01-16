@@ -18,14 +18,14 @@ std::vector<Coordinate> Knight::getPossibleMoves() {
     std::vector<Coordinate> possibleMoves;
 
     int directions[8][2] = {
-        {2, 1},   // 2 w prawo, 1 w dół
-        {1, 2},   // 1 w prawo, 2 w dół
-        {-1, 2},  // 1 w lewo, 2 w dół
-        {-2, 1},  // 2 w lewo, 1 w dół
-        {-2, -1}, // 2 w lewo, 1 w górę
-        {-1, -2}, // 1 w lewo, 2 w górę
-        {1, -2},  // 1 w prawo, 2 w górę
-        {2, -1}   // 2 w prawo, 1 w górę
+        {2, 1},  
+        {1, 2},  
+        {-1, 2}, 
+        {-2, 1}, 
+        {-2, -1},
+        {-1, -2},
+        {1, -2}, 
+        {2, -1}  
     };
 
     for (auto& direction : directions) {
@@ -49,14 +49,14 @@ std::vector<Coordinate> Knight::getPossibleCaptures() {
     std::vector<Coordinate> possibleCaptures;
 
     int directions[8][2] = {
-        {2, 1},   // 2 w prawo, 1 w dół
-        {1, 2},   // 1 w prawo, 2 w dół
-        {-1, 2},  // 1 w lewo, 2 w dół
-        {-2, 1},  // 2 w lewo, 1 w dół
-        {-2, -1}, // 2 w lewo, 1 w górę
-        {-1, -2}, // 1 w lewo, 2 w górę
-        {1, -2},  // 1 w prawo, 2 w górę
-        {2, -1}   // 2 w prawo, 1 w górę
+        {2, 1},  
+        {1, 2},  
+        {-1, 2}, 
+        {-2, 1}, 
+        {-2, -1},
+        {-1, -2},
+        {1, -2}, 
+        {2, -1}  
     };
 
     for (auto& direction : directions) {
@@ -67,7 +67,6 @@ std::vector<Coordinate> Knight::getPossibleCaptures() {
         int y = boardPosition.y + dy;
 
         if (board->isWithinBounds(x, y) && board->isEnemyPieceAt(x, y, m_color)) {
-            // Jeśli na tym polu jest wroga bierka, dodajemy do możliwych zbicia
             possibleCaptures.push_back(Coordinate(x, y));
         }
     }
@@ -79,24 +78,21 @@ std::vector<Coordinate> Knight::getPossibleCaptures() {
 bool Knight::isValidMove(int boardX, int boardY) {
 
     if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
-        return false;  // Ruch poza planszę
+        return false;  
     }
 
-    // Obliczenie różnicy między aktualną a docelową pozycją
     int dx = abs(boardX - boardPosition.x);
     int dy = abs(boardY - boardPosition.y);
 
-    // Sprawdzenie, czy ruch jest w kształcie "L" (2 pola w jednym kierunku, 1 pole w drugim)
     if ((dx == 2 && dy == 1) || (dx == 1 && dy == 2)) {
-        // Sprawdzenie, czy na docelowej pozycji znajduje się przeciwnik lub jest puste
         if (board->isEmpty(boardX, boardY)) {
-            return true;  // Ruch do pustego pola jest dozwolony
+            return true;  
         } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
             return true;
         }
     }
     
-    return false;  // W innych przypadkach ruch jest niedozwolony
+    return false;  
 }
 
 void Knight::rotatePiece() {

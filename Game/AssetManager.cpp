@@ -1,18 +1,17 @@
 #include "AssetManager.h"
 
 void AssetManager::LoadTexture(std::string name, std::string fileName) {
-    // Sprawdzenie, czy tekstura już istnieje
     if (this->_textures.find(name) != this->_textures.end()) {
-        std::cout << "Tekstura '" << name << "' już istnieje. Nie dodajemy ponownie." << std::endl;
-        return; // Wyjdź z funkcji, jeśli tekstura już istnieje
+        std::cout << "Texture '" << name << "' already exist . Dont add again" << std::endl;
+        return; 
     }
 
     sf::Texture texture;
     if (texture.loadFromFile(fileName)) {
         this->_textures[name] = texture;
-        std::cout << "Załadowano teksturę '" << name << "' z pliku '" << fileName << "'." << std::endl;
+        std::cout << "Load texture '" << name << "' from file  '" << fileName << "'." << std::endl;
     } else {
-        std::cout << "Nie udało się załadować tekstury z pliku '" << fileName << "'." << std::endl;
+        std::cout << "Couldn't load texture from file '" << fileName << "'." << std::endl;
     }
 }
 

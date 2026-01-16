@@ -17,7 +17,6 @@ Rook::Rook(int color, int boardX, int boardY, Board* board, sf::Texture& rookTex
 std::vector<Coordinate> Rook::getPossibleMoves() {
     std::vector<Coordinate> possibleMoves;
 
-    // Kierunki ruchu wieży (pionowe i poziome)
     int directions[4][2] = {
         {1, 0},   // W prawo
         {-1, 0},  // W lewo
@@ -25,7 +24,6 @@ std::vector<Coordinate> Rook::getPossibleMoves() {
         {0, -1}   // W górę
     };
 
-    // Sprawdzanie wszystkich kierunków
     for (auto& direction : directions) {
         int dx = direction[0];
         int dy = direction[1];
@@ -44,7 +42,7 @@ std::vector<Coordinate> Rook::getPossibleMoves() {
                     if (board->isEnemyPieceAt(x, y, m_color)) {
                         possibleMoves.push_back(Coordinate(x, y));
                     }
-                    break;  // Nie można kontynuować po napotkaniu bierki
+                    break;  
                 }
             } else {
                 break;
@@ -58,15 +56,13 @@ std::vector<Coordinate> Rook::getPossibleMoves() {
 std::vector<Coordinate> Rook::getPossibleCaptures() {
     std::vector<Coordinate> possibleCaptures;
 
-    // Kierunki ruchu wieży (pionowe i poziome)
     int directions[4][2] = {
-        {1, 0},   // W prawo
-        {-1, 0},  // W lewo
-        {0, 1},   // W dół
-        {0, -1}   // W górę
+        {1, 0},   
+        {-1, 0},  
+        {0, 1},   
+        {0, -1}   
     };
 
-    // Sprawdzanie wszystkich kierunków
     for (auto& direction : directions) {
         int dx = direction[0];
         int dy = direction[1];
@@ -81,12 +77,12 @@ std::vector<Coordinate> Rook::getPossibleCaptures() {
             if (board->isWithinBounds(x, y)) {
                 if (board->isEnemyPieceAt(x, y, m_color)) {
                     possibleCaptures.push_back(Coordinate(x, y));
-                    break;  // Nie można kontynuować po napotkaniu bierki
+                    break;  
                 } else if (!board->isEmpty(x, y)) {
-                    break;  // Napotkano własną bierkę, nie można kontynuować
+                    break;  
                 }
             } else {
-                break;  // Poza granicami planszy
+                break;  
             }
         }
     }
@@ -96,32 +92,29 @@ std::vector<Coordinate> Rook::getPossibleCaptures() {
 
 bool Rook::isValidMove(int boardX, int boardY) {
     if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
-        return false;  // Ruch poza planszę
+        return false;  
     }
-    // Sprawdzenie, czy ruch jest w linii prostej (po osi X lub Y)
     if (boardX != boardPosition.x && boardY != boardPosition.y) {
-        return false; // Ruch jest nieprawidłowy, bo wieża nie może poruszać się po skosie
+        return false;
     }
 
-    // Sprawdzenie, czy droga jest wolna
-    if (boardX == boardPosition.x) {  // Ruch w pionie
+    if (boardX == boardPosition.x) {  
         int direction = (boardY > boardPosition.y) ? 1 : -1;
         for (int i = 1; i < abs(boardY - boardPosition.y); ++i) {
             if (!board->isEmpty(boardX, boardPosition.y + i * direction)) {
-                return false;  // Jeśli droga jest zablokowana, ruch jest nieprawidłowy
+                return false;
             }
         }
         
-    } else if (boardY == boardPosition.y) {  // Ruch w poziomie
+    } else if (boardY == boardPosition.y) {  
         int direction = (boardX > boardPosition.x) ? 1 : -1;
         for (int i = 1; i < abs(boardX - boardPosition.x); ++i) {
             if (!board->isEmpty(boardPosition.x + i * direction, boardY)) {
-                return false;  // Jeśli droga jest zablokowana, ruch jest nieprawidłowy
+                return false;  
             }
         }
     }
 
-    // Sprawdzenie, czy docelowe pole jest puste, lub znajduje się tam figura przeciwnika
     if (board->isEmpty(boardX, boardY)) {
         return true;
     } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {

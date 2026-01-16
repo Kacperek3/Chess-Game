@@ -75,10 +75,8 @@ void CapturedPieces::Draw() {
         }
 
         if (previousType.empty() || pieceType != previousType) {
-            // Jeśli zmiana typu figury, dodaj odstęp 20px
             x += 20;
         } else {
-            // Jeśli ten sam typ figury, dodaj odstęp 10px
             x += 10;
         }
         piece.setPosition(x, y);

@@ -52,7 +52,7 @@ std::vector<Coordinate> Queen::getPossibleMoves() {
                     if (board->isEnemyPieceAt(x, y, m_color)) {
                         possibleMoves.push_back(Coordinate(x, y));
                     }
-                    break;  // Nie można kontynuować po napotkaniu bierki
+                    break;
                 }
             } else {
                 break;
@@ -60,7 +60,6 @@ std::vector<Coordinate> Queen::getPossibleMoves() {
         }
     }
 
-    // Sprawdzanie wszystkich kierunków (pionowe i poziome)
     for (auto& direction : straightDirections) {
         int dx = direction[0];
         int dy = direction[1];
@@ -79,7 +78,7 @@ std::vector<Coordinate> Queen::getPossibleMoves() {
                     if (board->isEnemyPieceAt(x, y, m_color)) {
                         possibleMoves.push_back(Coordinate(x, y));
                     }
-                    break;  // Nie można kontynuować po napotkaniu bierki
+                    break;
                 }
             } else {
                 break;
@@ -93,23 +92,20 @@ std::vector<Coordinate> Queen::getPossibleMoves() {
 std::vector<Coordinate> Queen::getPossibleCaptures() {
     std::vector<Coordinate> possibleCaptures;
 
-    // Kierunki ruchu - przekątne (jak goniec)
     int diagonalDirections[4][2] = {
-        {1, 1},   // Przekątna w prawo w dół
-        {-1, 1},  // Przekątna w lewo w dół
-        {-1, -1}, // Przekątna w lewo w górę
-        {1, -1}   // Przekątna w prawo w górę
+        {1, 1},   
+        {-1, 1},  
+        {-1, -1}, 
+        {1, -1}   
     };
 
-    // Kierunki ruchu - pionowe i poziome (jak wieża)
     int straightDirections[4][2] = {
-        {1, 0},   // W prawo
-        {-1, 0},  // W lewo
-        {0, 1},   // W dół
-        {0, -1}   // W górę
+        {1, 0},   
+        {-1, 0},  
+        {0, 1},   
+        {0, -1}   
     };
 
-    // Sprawdzanie wszystkich kierunków (przekątne)
     for (auto& direction : diagonalDirections) {
         int dx = direction[0];
         int dy = direction[1];
@@ -124,17 +120,16 @@ std::vector<Coordinate> Queen::getPossibleCaptures() {
             if (board->isWithinBounds(x, y)) {
                 if (board->isEnemyPieceAt(x, y, m_color)) {
                     possibleCaptures.push_back(Coordinate(x, y));
-                    break;  // Możemy bić tylko pierwszą napotkaną bierkę przeciwnika
+                    break;
                 } else if (!board->isEmpty(x, y)) {
-                    break;  // Jeśli natrafiliśmy na sojuszniczą bierkę, nie można bić dalej
+                    break;
                 }
             } else {
-                break;  // Poza planszą
+                break;  
             }
         }
     }
 
-    // Sprawdzanie wszystkich kierunków (pionowe i poziome)
     for (auto& direction : straightDirections) {
         int dx = direction[0];
         int dy = direction[1];
@@ -149,12 +144,12 @@ std::vector<Coordinate> Queen::getPossibleCaptures() {
             if (board->isWithinBounds(x, y)) {
                 if (board->isEnemyPieceAt(x, y, m_color)) {
                     possibleCaptures.push_back(Coordinate(x, y));
-                    break;  // Możemy bić tylko pierwszą napotkaną bierkę przeciwnika
+                    break;  
                 } else if (!board->isEmpty(x, y)) {
-                    break;  // Jeśli natrafiliśmy na sojuszniczą bierkę, nie można bić dalej
+                    break;  
                 }
             } else {
-                break;  // Poza planszą
+                break;  
             }
         }
     }
@@ -165,34 +160,30 @@ std::vector<Coordinate> Queen::getPossibleCaptures() {
 
 bool Queen::isValidMove(int boardX, int boardY) {
     if (!board->isWithinBounds(this->boardPosition.x, this->boardPosition.y) || !board->isWithinBounds(boardX, boardY)) {
-        return false;  // Ruch poza planszę
+        return false;  
     }
 
     int deltaX = abs(boardX - boardPosition.x);
     int deltaY = abs(boardY - boardPosition.y);
 
-    // Królowa porusza się jak wieża (po prostej) lub jak goniec (po przekątnej)
     if (boardX == boardPosition.x || boardY == boardPosition.y) {
-        // Ruch jak wieża
         return isValidRookMove(boardX, boardY);
     } else if (deltaX == deltaY) {
-        // Ruch jak goniec
         return isValidBishopMove(boardX, boardY);
     }
     
-    return false;  // W innych przypadkach ruch jest niedozwolony
+    return false;  
 }
 
 bool Queen::isValidRookMove(int boardX, int boardY) {
-    // Sprawdzenie, czy droga jest wolna w pionie lub poziomie (jak w wieży)
-    if (boardX == boardPosition.x) {  // Ruch w pionie
+    if (boardX == boardPosition.x) {  
         int direction = (boardY > boardPosition.y) ? 1 : -1;
         for (int i = 1; i < abs(boardY - boardPosition.y); ++i) {
             if (!board->isEmpty(boardX, boardPosition.y + i * direction)) {
                 return false;
             }
         }
-    } else if (boardY == boardPosition.y) {  // Ruch w poziomie
+    } else if (boardY == boardPosition.y) {  
         int direction = (boardX > boardPosition.x) ? 1 : -1;
         for (int i = 1; i < abs(boardX - boardPosition.x); ++i) {
             if (!board->isEmpty(boardPosition.x + i * direction, boardY)) {
@@ -201,7 +192,6 @@ bool Queen::isValidRookMove(int boardX, int boardY) {
         }
     }
 
-    // Sprawdzenie, czy docelowe pole jest puste, lub znajduje się tam figura przeciwnika
     if (board->isEmpty(boardX, boardY)) {
         return true;
     } else if (board->isEnemyPieceAt(boardX, boardY, m_color)) {
@@ -212,7 +202,6 @@ bool Queen::isValidRookMove(int boardX, int boardY) {
 }
 
 bool Queen::isValidBishopMove(int boardX, int boardY) {
-    // Sprawdzenie, czy droga jest wolna po przekątnej (jak w gońcu)
     int directionX = (boardX > boardPosition.x) ? 1 : -1;
     int directionY = (boardY > boardPosition.y) ? 1 : -1;
 
