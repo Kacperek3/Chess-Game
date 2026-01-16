@@ -2,30 +2,61 @@
 #include <SFML/Graphics.hpp>
 #include "Board.h"
 #include <iostream>
-#include "GameState.h"
-#include "GameStateManager.h"
+#include "State.h"
+#include "Game.h"
+#include <string>
+#include <memory>
+#include "Clock.h"
+#include "CapturedPieces.h"
+#include "Decorations.h"
+#include "PawnPromotion.h"
+#include "GameSounds.h"
+#include "GameOver.h"
 
-class GameWith2State : public GameState {
+class GameWith2State : public State {
 public:
-    GameWith2State(GameStateManager* gsm, sf::RenderWindow* window);
+    GameWith2State(GameDataRef data);
 
 private:
-    void handleInput() override;
-    void update() override;
-    void render() override;
+    void Init() override;
+
+    void HandleInput() override;
+    void Update() override;
+    void Draw() override;
+    void ClearObjects() override;
 
     void startDragging(const sf::Vector2f& mousePosition);
-    void stopDragging(const sf::Vector2f& mousePosition);
-    void toggleCoordinates();
-    
-    GameStateManager* gsm;
-    sf::RenderWindow* window;
+    void stopDragging(sf::Vector2f& mousePosition);
 
-    Board board;
+    bool clickedOnPiece(const sf::Vector2f& mousePosition);
+    void clickedOnField(const sf::Vector2f& mousePosition);
+
+    void rotateView();
+    
+
+    GameDataRef _data;
+    Board _board;
+
+    Piece *selectedPiece = nullptr;
+
 
     int currentPlayerTurn;
     sf::Vector2f dragOffset;
     bool isDragging = false;
     Piece* draggedPiece = nullptr;
-    bool showCoordinates = false;
+    bool isBoardRotated = false;
+
+    ClockWidget *_clockWidget;
+    bool _isClockTimeSet = false;
+
+
+    PawnPromotion *_pawnPromotion;
+    GameOver *_gameOver;
+    CapturedPieces *_capturedPieces;
+    Decorations *_decorations;
+    GameSounds *_gameSounds;
+    bool _isGameStartSoundPlayed = false;
+
+    bool _isMovingAllowed = true;
+    bool _isGameOver = false;
 };

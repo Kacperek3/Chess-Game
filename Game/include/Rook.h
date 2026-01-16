@@ -6,7 +6,7 @@
 
 class Rook : public Piece {
 public:
-    Rook(int color, int boardX, int boardY, Board* board);
+    Rook(int color, int boardX, int boardY, Board* board, sf::Texture& rookTexture);
     void move(int boardX, int boardY) override;
     Rook();
     ~Rook();
@@ -15,6 +15,7 @@ public:
     bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+    void rotatePiece() override;
 
     bool isFirstMove() const { return firstMove; }
     

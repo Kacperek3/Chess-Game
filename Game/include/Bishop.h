@@ -7,7 +7,7 @@
 
 class Bishop : public Piece {
 public:
-    Bishop(int color, int boardX, int boardY, Board* board);
+    Bishop(int color, int boardX, int boardY, Board* board, sf::Texture& bishopTexture);
     Bishop();
     ~Bishop();
 
@@ -15,6 +15,7 @@ public:
     bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+    void rotatePiece() override;
     
 private:
     

@@ -7,7 +7,7 @@
 
 class Queen : public Piece {
 public:
-    Queen(int color, int boardX, int boardY, Board* board);
+    Queen(int color, int boardX, int boardY, Board* board, sf::Texture& queenTexture);
     Queen();
     ~Queen();
 
@@ -17,6 +17,7 @@ public:
     bool isValidBishopMove(int boardX, int boardY);
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+    void rotatePiece() override;
     
 private:
     

@@ -3,10 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include "Positions.h"
+#include <iostream>
 
 #define WHITE 0
 #define BLACK 1
 
+#define UP 1
+#define DOWN -1
 
 class Board;
 
@@ -23,7 +26,7 @@ public:
         Pawn, Rook, Knight, Bishop, Queen, King
     };
 
-    Piece(int color, sf::Vector2f position, PieceType type, int boardX, int boardY);
+    Piece(int color, sf::Vector2f position, PieceType type, int boardX, int boardY, int value);
     Piece();
     virtual ~Piece();
 
@@ -34,18 +37,43 @@ public:
     virtual bool isValidMove(int boardX, int boardY) = 0;
     virtual std::vector<Coordinate> getPossibleMoves() = 0;
     virtual std::vector<Coordinate> getPossibleCaptures() = 0;
+    virtual void rotatePiece();
 
-
+    int getValue() { return _value; }
     sf::Sprite& getSprite();
     sf::Vector2f getPosition();
     Coordinate getBoardPosition();
     int getColor() { return m_color; }
     PieceType getType() { return m_type; }
-    
+
+    std::string getTypeName() {
+        if(m_color == BLACK){
+            switch (m_type) {
+            case PieceType::Pawn: return "bp";
+            case PieceType::Rook: return "br";
+            case PieceType::Knight: return "bn";
+            case PieceType::Bishop: return "bb";
+            case PieceType::Queen: return "bq";
+            case PieceType::King: return "bk";
+            }
+        }
+
+        if(m_color == WHITE){
+            switch (m_type) {
+            case PieceType::Pawn: return "wp";
+            case PieceType::Rook: return "wr";
+            case PieceType::Knight: return "wn";
+            case PieceType::Bishop: return "wb";
+            case PieceType::Queen: return "wq";
+            case PieceType::King: return "wk";
+            }
+        }
+        return "error";
+    }
 
 protected:
+    int _value;
     Board* board; // wskaźnik na planszę
-    sf::Texture texture; // tekstura figury
     sf::Sprite sprite; // sprite figury
     sf::Vector2f m_position; // pozycja figury na planszy
     int m_color; // kolor figury

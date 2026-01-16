@@ -8,7 +8,7 @@
 
 class Pawn : public Piece {
 public:
-    Pawn(int color, int boardX, int boardY, Board* board);
+    Pawn(int color, int boardX, int boardY, Board* board, int direction, sf::Texture& pawnTexture);
     Pawn();
     ~Pawn();
 
@@ -17,9 +17,10 @@ public:
     bool isValidMove(int boardX, int boardY) override;
     std::vector<Coordinate> getPossibleMoves() override;
     std::vector<Coordinate> getPossibleCaptures() override;
+    void rotatePiece() override;
     
     
 private:
     bool firstMove = true;
-    
+    int direction;
 };
